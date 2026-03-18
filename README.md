@@ -1,77 +1,74 @@
 # HTB Writeups
 
-## 1. Overview
-
-This repository contains writeups for Hack The Box Labs.
-The focus is on documenting the process of service analysis and access, rather than simply recording answers.
-
-Each writeup follows a consistent structure to ensure clarity and reproducibility.
+This repository contains writeups for Hack The Box Starting Point machines.  
+Each writeup focuses on identifying vulnerabilities, understanding attack paths, and documenting exploitation clearly.
 
 ---
 
-## 2. Objective
+## Project Overview
 
-* Understand the basic penetration testing workflow
-* Develop a service-oriented approach to exploitation
-* Build an enumeration-first mindset
-* Learn how common network services operate
+The purpose of this repository is not just to solve machines, but to understand how and why vulnerabilities can be exploited.
 
----
+Each writeup follows a consistent structure:
 
-## 3. Methodology
-
-All machines are approached using the following steps:
-
-1. Port scanning and service identification
-2. Service behavior analysis
-3. Authentication and access validation
-4. Exploitation of misconfigurations
-5. File discovery and flag retrieval
+- Enumeration
+- Analysis
+- Exploitation
+- Flag Retrieval
+- Root Cause
 
 ---
 
-## 4. Structure
+## Machines
 
-HTB-writeups/
-├── README.md
-├── Meow/
-│   └── writeup.md
-├── Fawn/
-│   └── writeup.md
-├── Dancing/
-│   └── writeup.md
+Meow  
+Service: Telnet  
+Vulnerability: Authentication bypass (no password)  
+Writeup: ./Meow/writeup.md  
 
----
+Fawn  
+Service: FTP  
+Vulnerability: Anonymous login enabled  
+Writeup: ./Fawn/writeup.md  
 
-## 5. Scope
-
-Current machines included:
-
-* Meow (Telnet)
-* Fawn (FTP)
-* Dancing (SMB)
-
-Each machine focuses on a single service misconfiguration to demonstrate fundamental attack techniques.
+Dancing  
+Service: SMB  
+Vulnerability: Null session  
+Writeup: ./Dancing/writeup.md  
 
 ---
 
-## 6. Notes
+## Skills
 
-* Flags are intentionally excluded
-* The focus is on process and reasoning
-* Each step is written to allow reproducibility
-
----
-
-## 7. Progress
-
-Meow: Completed
-Fawn: Completed
-Dancing: Completed
-Redeemer: In Progress
+- Network scanning (nmap)
+- Service enumeration
+- FTP, SMB, Telnet protocol understanding
+- Authentication bypass techniques
+- Anonymous access and null sessions
+- Basic post-exploitation
 
 ---
 
-## 8. Conclusion
+## Methodology
 
-The goal of this repository is to build a solid foundation in penetration testing by focusing on core concepts such as enumeration, service interaction, and misconfiguration exploitation.
+1. Identify open ports and services  
+2. Analyze potential vulnerabilities  
+3. Attempt exploitation based on findings  
+4. Confirm access through flag retrieval  
+5. Identify the root cause  
+
+---
+
+## Purpose
+
+- Build a foundation in penetration testing  
+- Understand common misconfigurations  
+- Develop structured exploitation workflow  
+- Practice technical documentation  
+
+---
+
+## Notes
+
+- All machines are from Hack The Box Starting Point  
+- This repository is for educational purposes only  
