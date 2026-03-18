@@ -1,13 +1,13 @@
 # Fawn - Hack The Box Writeup
 
-## 1. Overview
+## 1. 개요
 
 Machine: Fawn  
 Difficulty: Very Easy  
 Operating System: Linux  
 
-본 문제는 FTP 서비스의 잘못된 접근 제어 설정을 이용하여 파일에 접근하는 과정이다.  
-핵심은 서비스 식별 이후 인증 방식의 취약점을 확인하는 것이다.  
+이 문제는 FTP 서비스에서 익명 로그인이 허용된 설정을 이용하여 파일에 접근하는 문제이다.  
+핵심은 인증 없이 접근 가능한 리소스를 식별하는 것이다.
 
 ---
 
@@ -15,7 +15,7 @@ Operating System: Linux
 
 대상 시스템의 열린 포트와 실행 중인 서비스를 확인한다.
 
-nmap -sC -sV <TARGET_IP>
+nmap -Pn -sC -sV <TARGET_IP>
 
 ![nmap](./images/nmap.png)
 
@@ -23,24 +23,23 @@ nmap -sC -sV <TARGET_IP>
 
 21/tcp open  ftp  
 
-FTP 서비스가 외부에 노출되어 있음을 확인할 수 있다.  
-
-→ FTP 서비스는 설정에 따라 익명 로그인(anonymous)이 허용될 수 있으므로  
-인증 없이 접근 가능한지 확인하는 것이 중요하다.  
+21번 포트에서 FTP 서비스가 실행 중인 것을 확인할 수 있다.  
+FTP는 설정에 따라 anonymous 로그인이 가능한 경우가 존재한다.
 
 ---
 
 ## 3. Analysis
 
-FTP는 파일 전송을 위한 프로토콜이며, 다음과 같은 특징이 있다:
+FTP(File Transfer Protocol)는 파일 전송을 위한 프로토콜이다.
 
-* 기본적으로 사용자 인증 필요  
-* 설정에 따라 익명 접속 허용 가능  
-* 인증 정보가 평문으로 전송됨  
+주요 특징:
 
-익명 접속이 허용된 경우, 인증 없이 파일 접근이 가능하다.  
+- 사용자 인증 기반 접근  
+- anonymous 계정 지원 가능  
+- 잘못된 설정 시 인증 없이 접근 가능  
 
-따라서 anonymous 계정을 이용한 로그인 시도를 우선적으로 수행한다.  
+따라서 FTP 서비스가 확인되면,  
+anonymous 로그인이 가능한지 확인하는 것이 중요하다.
 
 ---
 
@@ -52,54 +51,51 @@ ftp <TARGET_IP>
 
 ![ftp login](./images/ftp-login.png)
 
-접속 시 사용자 이름을 입력한다.
+로그인 시도:
 
-Name: anonymous  
+Username: anonymous  
+Password: anonymous  
 
-비밀번호는 아무 값이나 입력하거나 비워둔다.
+![ftp anon](./images/ftp-anon.png)
 
-Password:  
-
-→ 별도의 인증 없이 로그인에 성공하며 FTP 쉘에 접근할 수 있다.  
+익명 로그인에 성공한다.
 
 ---
 
-## 5. Flag Retrieval
+## 5. Flag 획득
 
-현재 디렉토리의 파일 목록을 확인한다.
+파일 목록을 확인한다.
 
-ls  
+ls
 
 ![ftp ls](./images/ftp-ls.png)
 
-→ 디렉토리 내에서 flag 파일을 확인할 수 있다.  
+flag 파일을 확인한 후 다운로드한다.
 
-flag 파일을 다운로드한다.
-
-get flag.txt  
-
-![ftp get](./images/ftp-get.png)
+get flag.txt
 
 ---
 
 ## 6. Root Cause
 
-FTP 서비스에서 anonymous 접근이 허용되어 있다.  
-인증 없이 파일 시스템에 접근 가능한 설정이 적용된 것이 근본적인 원인이다.  
+FTP 서비스에서 anonymous 로그인이 허용되어 있다.
+
+이로 인해 인증 없이 파일 시스템에 접근이 가능하다.
 
 ---
 
-## 7. Commands Summary
+## 7. 사용 명령어
 
-nmap -sC -sV <TARGET_IP>  
+nmap -Pn -sC -sV <TARGET_IP>  
 ftp <TARGET_IP>  
 ls  
 get flag.txt  
 
 ---
 
-## 8. Conclusion
+## 8. 결론
 
-FTP 서비스는 설정에 따라 인증 없이 접근이 가능한 경우가 존재한다.  
-Enumeration 단계에서 인증 우회 가능 여부를 확인하는 것이 중요하며,  
-anonymous 접근 여부를 확인하는 것이 공격의 핵심이다.  
+FTP 서비스에서 익명 로그인이 허용될 경우  
+민감한 파일이 외부에 노출될 수 있다.
+
+서비스 접근 제어 설정이 매우 중요하다.
