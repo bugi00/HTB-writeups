@@ -1,15 +1,16 @@
 # HTB Writeups
 
-This repository contains writeups for Hack The Box Starting Point machines.  
-Each writeup focuses on identifying vulnerabilities, understanding attack paths, and documenting exploitation clearly.
+This repository contains writeups for Hack The Box machines.
+
+It currently includes Starting Point machines and will be expanded to cover higher difficulty levels.
 
 ---
 
 ## Project Overview
 
-The purpose of this repository is not just to solve machines, but to understand how and why vulnerabilities can be exploited.
+The goal of this repository is to understand vulnerabilities and attack paths, not just reproduce solutions.
 
-Each writeup follows a consistent structure:
+Each writeup follows a structured approach:
 
 - Enumeration
 - Analysis
@@ -19,56 +20,4 @@ Each writeup follows a consistent structure:
 
 ---
 
-## Machines
-
-Meow  
-Service: Telnet  
-Vulnerability: Authentication bypass (no password)  
-Writeup: ./Meow/writeup.md  
-
-Fawn  
-Service: FTP  
-Vulnerability: Anonymous login enabled  
-Writeup: ./Fawn/writeup.md  
-
-Dancing  
-Service: SMB  
-Vulnerability: Null session  
-Writeup: ./Dancing/writeup.md  
-
----
-
-## Skills
-
-- Network scanning (nmap)
-- Service enumeration
-- FTP, SMB, Telnet protocol understanding
-- Authentication bypass techniques
-- Anonymous access and null sessions
-- Basic post-exploitation
-
----
-
-## Methodology
-
-1. Identify open ports and services  
-2. Analyze potential vulnerabilities  
-3. Attempt exploitation based on findings  
-4. Confirm access through flag retrieval  
-5. Identify the root cause  
-
----
-
-## Purpose
-
-- Build a foundation in penetration testing  
-- Understand common misconfigurations  
-- Develop structured exploitation workflow  
-- Practice technical documentation  
-
----
-
-## Notes
-
-- All machines are from Hack The Box Starting Point  
-- This repository is for educational purposes only  
+## Repository Structure
