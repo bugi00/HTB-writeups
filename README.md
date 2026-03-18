@@ -1,100 +1,77 @@
-# HTB Writeups - BUGI00
+# HTB Writeups
 
-## About
+## 1. Overview
 
-This repository documents my journey through Hack The Box Labs.
+This repository contains writeups for Hack The Box Labs.
+The focus is on documenting the process of service analysis and access, rather than simply recording answers.
 
-Rather than simply solving machines, the focus is on understanding:
-
-* Why a specific enumeration step is performed
-* How exposed services lead to attack opportunities
-* How misconfigurations can be leveraged for access
-
-All writeups are written in Korean and emphasize reproducibility and reasoning.
+Each writeup follows a consistent structure to ensure clarity and reproducibility.
 
 ---
 
-##  Objective
+## 2. Objective
 
-* Build a solid foundation in penetration testing
-* Develop an enumeration-first mindset
-* Understand core network services (Telnet, FTP, SMB)
-* Identify and exploit common misconfigurations
+* Understand the basic penetration testing workflow
+* Develop a service-oriented approach to exploitation
+* Build an enumeration-first mindset
+* Learn how common network services operate
 
 ---
 
-##  Structure
+## 3. Methodology
 
-```
+All machines are approached using the following steps:
+
+1. Port scanning and service identification
+2. Service behavior analysis
+3. Authentication and access validation
+4. Exploitation of misconfigurations
+5. File discovery and flag retrieval
+
+---
+
+## 4. Structure
+
 HTB-writeups/
- ├── README.md
- ├── Meow/
- │   └── writeup.md
- ├── Fawn/
- │   └── writeup.md
- ├── Dancing/
- │   └── writeup.md
-```
+├── README.md
+├── Meow/
+│   └── writeup.md
+├── Fawn/
+│   └── writeup.md
+├── Dancing/
+│   └── writeup.md
 
 ---
 
-## Tools & Reasoning
+## 5. Scope
 
-* nmap
-  → Identify open ports and running services (starting point of all attacks)
+Current machines included:
 
-* telnet / ftp / smbclient
-  → Direct interaction with services to validate authentication and access control weaknesses
+* Meow (Telnet)
+* Fawn (FTP)
+* Dancing (SMB)
 
-These tools are used not just for execution, but for verifying assumptions during enumeration.
-
----
-
-## Methodology
-
-All machines follow a consistent approach:
-
-1. Enumeration (nmap, service detection)
-2. Service Analysis (protocol behavior understanding)
-3. Access Attempt (anonymous / weak authentication)
-4. Exploitation (misconfiguration abuse)
-5. Flag Retrieval
+Each machine focuses on a single service misconfiguration to demonstrate fundamental attack techniques.
 
 ---
 
-## Notes
+## 6. Notes
 
 * Flags are intentionally excluded
-* Focus is on process, not answers
-* Each step includes reasoning for reproducibility
+* The focus is on process and reasoning
+* Each step is written to allow reproducibility
 
 ---
 
-## Root Cause Summary
+## 7. Progress
 
-* Meow → Telnet allows plaintext authentication
-* Fawn → FTP allows anonymous login
-* Dancing → SMB allows null session access
-
----
-
-## Next Learning Path
-
-* Redeemer → Database interaction (Redis)
-* Explosion → Windows authentication (RDP)
-* Preignition → Web enumeration basics
-
-The goal is to gradually move from simple misconfigurations to multi-step exploitation.
+Meow: Completed
+Fawn: Completed
+Dancing: Completed
+Redeemer: In Progress
 
 ---
 
-## Progress
+## 8. Conclusion
 
-| Machine  | Difficulty | Status |
-| -------- | ---------- | ------ |
-| Meow     | Very Easy  | ✅      |
-| Fawn     | Very Easy  | ✅      |
-| Dancing  | Very Easy  | ✅      |
-| Redeemer | Very Easy  | ⏳      |
-
----
+The goal of this repository is to build a solid foundation in penetration testing by focusing on core concepts such as enumeration, service interaction, and misconfiguration exploitation.
