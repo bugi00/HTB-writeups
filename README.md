@@ -21,3 +21,74 @@ Each writeup follows a structured approach:
 ---
 
 ## Repository Structure
+
+HTB-writeups/
+ ├── Starting-Point/
+ │    ├── Meow/
+ │    ├── Fawn/
+ │    └── Dancing/
+ │
+ ├── Machines/
+ │    ├── Easy/
+ │    ├── Medium/
+ │    └── Hard/
+ │
+ └── README.md
+
+---
+
+## Current Machines
+
+### Starting Point
+
+Meow  
+Service: Telnet  
+Vulnerability: Authentication bypass  
+Writeup: ./Starting-Point/Meow/writeup.md  
+
+Fawn  
+Service: FTP  
+Vulnerability: Anonymous login  
+Writeup: ./Starting-Point/Fawn/writeup.md  
+
+Dancing  
+Service: SMB  
+Vulnerability: Null session  
+Writeup: ./Starting-Point/Dancing/writeup.md  
+
+---
+
+## Skills
+
+- Network scanning (nmap)
+- Service enumeration
+- FTP, SMB, Telnet protocol analysis
+- Authentication bypass techniques
+- Anonymous access and null sessions
+- Basic post-exploitation
+
+---
+
+## Methodology
+
+1. Identify open ports and services  
+2. Analyze potential vulnerabilities  
+3. Attempt exploitation  
+4. Confirm access via flag retrieval  
+5. Analyze the root cause  
+
+---
+
+## Purpose
+
+- Build a solid foundation in penetration testing  
+- Understand real-world misconfigurations  
+- Develop structured exploitation workflow  
+- Improve technical documentation  
+
+---
+
+## Notes
+
+- All machines are from Hack The Box  
+- This repository is for educational purposes only  
