@@ -64,7 +64,7 @@ smbclient //<TARGET_IP>/WorkShares -N
 접속 후 내부 디렉토리를 확인한다.
 
 ls
-![smb login](images/smb-login.png)
+![smb ls](images/smb-ls.png)
 
 사용자 디렉토리 중 하나에 flag 파일이 존재한다.
 
