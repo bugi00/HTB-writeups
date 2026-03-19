@@ -18,7 +18,7 @@
 
 nmap -p- -sC -sV --min-rate 5000 $IP
 
-![nmap](images/nmap.png)
+![nmap-full](images/nmap-full.png)
 
 포트 873에서 rsync 서비스가 실행 중이며 protocol version 31을 사용하고 있음을 확인할 수 있다.
 
