@@ -1,5 +1,4 @@
-# Meow - Hack The Box Writeup
-
+# Meow
 ## 1. 개요
 
 Machine: Meow  
