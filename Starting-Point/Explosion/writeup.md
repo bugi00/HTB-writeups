@@ -10,7 +10,7 @@
 
 ## 대상 정보
 
-* Target IP: 10.129.8.33
+* Target IP: <Target IP>
 * OS: Windows
 * Service: RDP (3389/tcp)
 
