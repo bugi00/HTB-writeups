@@ -1,4 +1,4 @@
-# Dancing - Hack The Box Writeup
+# Dancing
 
 ## 1. 개요
 
