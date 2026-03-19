@@ -1,4 +1,4 @@
-# Fawn - Hack The Box Writeup
+# Fawn
 
 ## 1. 개요
 
