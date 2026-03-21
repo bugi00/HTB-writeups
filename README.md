@@ -2,91 +2,7 @@
 
 This repository contains writeups for Hack The Box machines.
 
-It currently includes Starting Point machines and will be expanded to cover higher difficulty levels.
-
----
-
-## 📌 Project Overview
-
-The goal of this repository is to understand vulnerabilities and attack paths, not just reproduce solutions.
-
-Each writeup follows a structured approach:
-
-- Enumeration
-- Analysis
-- Exploitation
-- Flag Retrieval
-- Root Cause
-
----
-
-## 📂 Repository Structure
-
-HTB-writeups/
-├── Starting-Point/
-│    ├── Meow/
-│    ├── Fawn/
-│    └── Dancing/
-│
-├── Machines/
-│    ├── Easy/
-│    ├── Medium/
-│    └── Hard/
-│
-└── README.md
-
----
-
-## 🚀 Current Machines
-
-### Starting Point
-
-| Machine  | Service | Vulnerability | Writeup |
-|----------|--------|--------------|--------|
-| Meow     | Telnet | Authentication bypass | ./Starting-Point/Meow/writeup.md |
-| Fawn     | FTP    | Anonymous login       | ./Starting-Point/Fawn/writeup.md |
-| Dancing  | SMB    | Null session          | ./Starting-Point/Dancing/writeup.md |
-
----
-
-## 🛠 Skills
-
-- Network scanning (nmap)
-- Service enumeration
-- FTP, SMB, Telnet protocol analysis
-- Authentication bypass techniques
-- Anonymous access and null sessions
-- Basic post-exploitation
-
----
-
-## ⚙️ Methodology
-
-1. Identify open ports and services  
-2. Analyze potential vulnerabilities  
-3. Attempt exploitation  
-4. Confirm access via flag retrieval  
-5. Analyze the root cause  
-
----
-
-## 🎯 Purpose
-
-- Build a solid foundation in penetration testing  
-- Understand real-world misconfigurations  
-- Develop structured exploitation workflow  
-- Improve technical documentation  
-
----
-
-## ⚠️ Notes
-
-- All machines are from Hack The Box  
-- This repository is for educational purposes only  # HTB Writeups
-
-This repository contains writeups for Hack The Box machines.
-
-It currently includes Starting Point machines and will be expanded to cover higher difficulty levels.
+It includes Starting Point machines and will be expanded to higher difficulty levels.
 
 ---
 
@@ -94,13 +10,13 @@ It currently includes Starting Point machines and will be expanded to cover high
 
 The goal of this repository is to understand vulnerabilities and attack paths, not just reproduce solutions.
 
-Each writeup follows a structured approach:
+Each writeup focuses on reasoning and follows a structured approach:
 
-- Enumeration
-- Analysis
-- Exploitation
-- Flag Retrieval
-- Root Cause
+* Enumeration
+* Analysis
+* Exploitation
+* Flag Retrieval
+* Root Cause
 
 ---
 
@@ -110,7 +26,12 @@ HTB-writeups/
 ├── Starting-Point/
 │    ├── Meow/
 │    ├── Fawn/
-│    └── Dancing/
+│    ├── Dancing/
+│    ├── Explosion/
+│    ├── Preignition/
+│    ├── Mongod/
+│    ├── Synced/
+│    └── Redeemer/
 │
 ├── Machines/
 │    ├── Easy/
@@ -123,131 +44,53 @@ HTB-writeups/
 
 ## Current Machines
 
-Starting Point
+### Starting Point (Tier 0)
 
-| Machine | Service | Vulnerability | Writeup |
-|--------|--------|--------------|--------|
-| Meow | Telnet | Authentication bypass | ./Starting-Point/Meow/writeup.md |
-| Fawn | FTP | Anonymous login | ./Starting-Point/Fawn/writeup.md |
-| Dancing | SMB | Null session | ./Starting-Point/Dancing/writeup.md |
-
----
-
-## Skills
-
-- Network scanning (nmap)
-- Service enumeration
-- FTP, SMB, Telnet protocol analysis
-- Authentication bypass techniques
-- Anonymous access and null sessions
-- Basic post-exploitation
-
----
-
-## Methodology
-
-1. Identify open ports and services  
-2. Analyze potential vulnerabilities  
-3. Attempt exploitation  
-4. Confirm access via flag retrieval  
-5. Analyze the root cause  
-
----
-
-## Purpose
-
-- Build a solid foundation in penetration testing  
-- Understand real-world misconfigurations  
-- Develop structured exploitation workflow  
-- Improve technical documentation  
-
----
-
-## Notes
-
-- All machines are from Hack The Box  
-- This repository is for educational purposes only # HTB Writeups
-
-This repository contains writeups for Hack The Box machines.
-
-It currently includes Starting Point machines and will be expanded to cover higher difficulty levels.
-
----
-
-## Project Overview
-
-The goal of this repository is to understand vulnerabilities and attack paths, not just reproduce solutions.
-
-Each writeup follows a structured approach:
-
-- Enumeration
-- Analysis
-- Exploitation
-- Flag Retrieval
-- Root Cause
-
----
-
-## Repository Structure
-
-HTB-writeups/
-├── Starting-Point/
-│    ├── Meow/
-│    ├── Fawn/
-│    └── Dancing/
-│
-├── Machines/
-│    ├── Easy/
-│    ├── Medium/
-│    └── Hard/
-│
-└── README.md
-
----
-
-## Current Machines
-
-Starting Point
-
-| Machine | Service | Vulnerability | Writeup |
-|--------|--------|--------------|--------|
-| Meow | Telnet | Authentication bypass | ./Starting-Point/Meow/writeup.md |
-| Fawn | FTP | Anonymous login | ./Starting-Point/Fawn/writeup.md |
-| Dancing | SMB | Null session | ./Starting-Point/Dancing/writeup.md |
+| Machine     | Service | Key Issue              | Writeup                                 |
+| ----------- | ------- | ---------------------- | --------------------------------------- |
+| Meow        | Telnet  | No authentication      | ./Starting-Point/Meow/writeup.md        |
+| Fawn        | FTP     | Anonymous login        | ./Starting-Point/Fawn/writeup.md        |
+| Dancing     | SMB     | Null session           | ./Starting-Point/Dancing/writeup.md     |
+| Explosion   | RDP     | Weak authentication    | ./Starting-Point/Explosion/writeup.md   |
+| Preignition | HTTP    | Broken authentication  | ./Starting-Point/Preignition/writeup.md |
+| Mongod      | MongoDB | No authentication      | ./Starting-Point/Mongod/writeup.md      |
+| Synced      | Rsync   | Anonymous access       | ./Starting-Point/Synced/writeup.md      |
+| Redeemer    | Redis   | Unauthenticated access | ./Starting-Point/Redeemer/writeup.md    |
 
 ---
 
 ## Skills
 
-- Network scanning (nmap)
-- Service enumeration
-- FTP, SMB, Telnet protocol analysis
-- Authentication bypass techniques
-- Anonymous access and null sessions
-- Basic post-exploitation
+* Network scanning (nmap)
+* Service enumeration
+* Protocol analysis (FTP, SMB, Telnet, Redis, MongoDB, Rsync)
+* Authentication bypass techniques
+* Misconfiguration exploitation
+* Basic post-exploitation
 
 ---
 
 ## Methodology
 
-1. Identify open ports and services  
-2. Analyze potential vulnerabilities  
-3. Attempt exploitation  
-4. Confirm access via flag retrieval  
-5. Analyze the root cause  
+1. Identify open ports and services
+2. Analyze service behavior and weaknesses
+3. Select the most probable attack path
+4. Exploit misconfiguration or weak authentication
+5. Verify access through flag retrieval
+6. Identify root cause
 
 ---
 
 ## Purpose
 
-- Build a solid foundation in penetration testing  
-- Understand real-world misconfigurations  
-- Develop structured exploitation workflow  
-- Improve technical documentation  
+* Build a solid foundation in penetration testing
+* Understand real-world misconfigurations
+* Develop structured attack reasoning
+* Improve technical documentation
 
 ---
 
 ## Notes
 
-- All machines are from Hack The Box  
-- This repository is for educational purposes only 
+* All machines are from Hack The Box
+* This repository is for educational purposes only
