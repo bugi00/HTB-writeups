@@ -22,11 +22,25 @@ Each writeup focuses on reasoning and follows a structured approach:
 
 ## Repository Structure
 
+## Repository Structure
+
 HTB-writeups/
 ├── Starting-Point/
 │    ├── Tier-0/
+│    │    ├── Meow/
+│    │    ├── Fawn/
+│    │    ├── Dancing/
+│    │    ├── Explosion/
+│    │    ├── Preignition/
+│    │    ├── Mongod/
+│    │    ├── Synced/
+│    │    └── Redeemer/
+│    │
 │    ├── Tier-1/
+│    │    └── Appointment/
+│    │
 │    └── Tier-2/
+│         └── (in progress)
 │
 ├── Machines/
 │    ├── Easy/
