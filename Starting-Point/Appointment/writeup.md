@@ -18,7 +18,7 @@
 
 nmap -sC -sV $IP
 
-![nmap](./images/1_nmap-full.png)
+![nmap-full](./images/1_nmap-full.png)
 
 80번 포트에서 Apache httpd 2.4.38 (Debian) 웹 서버가 실행 중인 것을 확인할 수 있다.
 
