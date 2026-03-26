@@ -12,11 +12,11 @@ The goal of this repository is to understand vulnerabilities and attack paths, n
 
 Each writeup focuses on reasoning and follows a structured approach:
 
-* Enumeration
-* Analysis
-* Exploitation
-* Flag Retrieval
-* Root Cause
+- Enumeration
+- Analysis
+- Exploitation
+- Flag Retrieval
+- Root Cause
 
 ---
 
@@ -24,14 +24,9 @@ Each writeup focuses on reasoning and follows a structured approach:
 
 HTB-writeups/
 ├── Starting-Point/
-│    ├── Meow/
-│    ├── Fawn/
-│    ├── Dancing/
-│    ├── Explosion/
-│    ├── Preignition/
-│    ├── Mongod/
-│    ├── Synced/
-│    └── Redeemer/
+│    ├── Tier-0/
+│    ├── Tier-1/
+│    └── Tier-2/
 │
 ├── Machines/
 │    ├── Easy/
@@ -44,29 +39,43 @@ HTB-writeups/
 
 ## Current Machines
 
-### Starting Point (Tier 0)
+### Starting Point - Tier 0
 
-| Machine     | Service | Key Issue              | Writeup                                 |
-| ----------- | ------- | ---------------------- | --------------------------------------- |
-| Meow        | Telnet  | No authentication      | ./Starting-Point/Meow/writeup.md        |
-| Fawn        | FTP     | Anonymous login        | ./Starting-Point/Fawn/writeup.md        |
-| Dancing     | SMB     | Null session           | ./Starting-Point/Dancing/writeup.md     |
-| Explosion   | RDP     | Weak authentication    | ./Starting-Point/Explosion/writeup.md   |
-| Preignition | HTTP    | Broken authentication  | ./Starting-Point/Preignition/writeup.md |
-| Mongod      | MongoDB | No authentication      | ./Starting-Point/Mongod/writeup.md      |
-| Synced      | Rsync   | Anonymous access       | ./Starting-Point/Synced/writeup.md      |
-| Redeemer    | Redis   | Unauthenticated access | ./Starting-Point/Redeemer/writeup.md    |
+| Machine     | Service | Key Issue              | Writeup                                          |
+|------------|--------|------------------------|--------------------------------------------------|
+| Meow       | Telnet | No authentication      | ./Starting-Point/Tier-0/Meow/writeup.md          |
+| Fawn       | FTP    | Anonymous login        | ./Starting-Point/Tier-0/Fawn/writeup.md          |
+| Dancing    | SMB    | Null session           | ./Starting-Point/Tier-0/Dancing/writeup.md       |
+| Explosion  | RDP    | Weak authentication    | ./Starting-Point/Tier-0/Explosion/writeup.md     |
+| Preignition| HTTP   | Broken authentication  | ./Starting-Point/Tier-0/Preignition/writeup.md   |
+| Mongod     | MongoDB| No authentication      | ./Starting-Point/Tier-0/Mongod/writeup.md        |
+| Synced     | Rsync  | Anonymous access       | ./Starting-Point/Tier-0/Synced/writeup.md        |
+| Redeemer   | Redis  | Unauthenticated access | ./Starting-Point/Tier-0/Redeemer/writeup.md      |
+
+---
+
+### Starting Point - Tier 1
+
+| Machine     | Service | Key Issue     | Writeup                                          |
+|------------|--------|--------------|--------------------------------------------------|
+| Appointment| HTTP   | SQL Injection| ./Starting-Point/Tier-1/Appointment/writeup.md   |
+
+---
+
+### Starting Point - Tier 2
+
+In progress.
 
 ---
 
 ## Skills
 
-* Network scanning (nmap)
-* Service enumeration
-* Protocol analysis (FTP, SMB, Telnet, Redis, MongoDB, Rsync)
-* Authentication bypass techniques
-* Misconfiguration exploitation
-* Basic post-exploitation
+- Network scanning (nmap)
+- Service enumeration
+- Protocol analysis (FTP, SMB, Telnet, Redis, MongoDB, Rsync, HTTP)
+- Authentication bypass techniques
+- Misconfiguration exploitation
+- Basic post-exploitation
 
 ---
 
@@ -83,14 +92,14 @@ HTB-writeups/
 
 ## Purpose
 
-* Build a solid foundation in penetration testing
-* Understand real-world misconfigurations
-* Develop structured attack reasoning
-* Improve technical documentation
+- Build a solid foundation in penetration testing
+- Understand real-world misconfigurations
+- Develop structured attack reasoning
+- Improve technical documentation
 
 ---
 
 ## Notes
 
-* All machines are from Hack The Box
-* This repository is for educational purposes only
+- All machines are from Hack The Box
+- This repository is for educational purposes only
