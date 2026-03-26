@@ -28,7 +28,7 @@ nmap -sC -sV $IP
 
 웹 브라우저로 접속하여 서비스 내용을 확인한다.
 
-![web](images/2_web_login.png)
+![web-login](./images/web-login.png)
 
 로그인 페이지가 제공되며, Username과 Password 입력을 통해 인증을 수행하는 구조이다.
 
@@ -51,7 +51,7 @@ SELECT * FROM users WHERE username = '$username' AND password = '$password';
 
 admin'#
 
-![sqli](images/3_sqli_attempt.png)
+![web-sqli](./images/web-sqli.png)
 
 `#` 이후의 구문이 주석 처리되면서 비밀번호 검증 조건이 제거된다.
 
@@ -67,7 +67,7 @@ SELECT * FROM users WHERE username = 'admin'
 
 로그인 성공 후 페이지에서 flag를 확인할 수 있다.
 
-![flag](images/4_flag.png)
+![flag](./images/flag.png)
 
 페이지 상단의 첫 단어는 "Congratulations"이며, 이를 통해 문제를 해결할 수 있다.
 
