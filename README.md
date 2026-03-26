@@ -22,11 +22,10 @@ Each writeup focuses on reasoning and follows a structured approach:
 
 ## Repository Structure
 
-## Repository Structure
-
+```
 HTB-writeups/
 ├── Starting-Point/
-│    ├── Tier-0/
+│    ├── Tier-0/        # Completed
 │    │    ├── Meow/
 │    │    ├── Fawn/
 │    │    ├── Dancing/
@@ -36,18 +35,20 @@ HTB-writeups/
 │    │    ├── Synced/
 │    │    └── Redeemer/
 │    │
-│    ├── Tier-1/
+│    ├── Tier-1/        # In progress
 │    │    └── Appointment/
 │    │
-│    └── Tier-2/
+│    └── Tier-2/        # Not started
 │         └── (in progress)
 │
 ├── Machines/
-│    ├── Easy/
-│    ├── Medium/
-│    └── Hard/
+│    ├── Easy/          # Not started
+│    ├── Medium/        # Not started
+│    └── Hard/          # Not started
 │
 └── README.md
+```
+
 
 ---
 
