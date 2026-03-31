@@ -27,7 +27,7 @@ nmap으로 대상 서버의 열린 포트와 서비스 버전을 확인한다.
 nmap -sC -sV $IP
 ```
 
-![nmap 스캔 결과](images/nmap-scan-result.png)
+![nmap 스캔 결과](images/nmap-full.png)
 
 22번 포트에서 OpenSSH, 80번 포트에서 Node.js(Express middleware)가 동작하고 있음을 확인했다. HTTP 타이틀이 "Bike"로 표시된다.
 
