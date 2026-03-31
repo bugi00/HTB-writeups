@@ -37,7 +37,7 @@ nmap -sC -sV $IP
 
 브라우저로 80번 포트에 접속하면 "Website Under Construction" 페이지가 나타나며, 이메일 주소를 입력하는 단일 폼이 존재한다.
 
-![웹 메인 페이지](images/02-web-main-page.png)
+![웹 메인 페이지](images/web-main-page.png)
 
 입력된 이메일 주소가 서버에서 처리된 후 페이지에 출력되는 구조이므로, 사용자 입력이 템플릿에 삽입되는지 여부를 확인할 필요가 있다.
 
@@ -47,7 +47,7 @@ nmap -sC -sV $IP
 
 Wappalyzer 확장 프로그램으로 웹 프레임워크와 언어를 확인한다.
 
-![Wappalyzer 결과](images/03-wappalyzer-result.png)
+![Wappalyzer 결과](images/wappalyzer-result.png)
 
 Web frameworks에 **Express**, Programming languages에 **Node.js**가 표시된다. nmap 결과와 일치하며, 서버 사이드 템플릿 엔진 사용 여부를 추가로 확인해야 한다.
 
@@ -63,7 +63,7 @@ curl -s -X POST http://$IP \
   --data 'action=Submit'
 ```
 
-![SSTI 테스트 결과](images/04-ssti-test-parse-error.png)
+![SSTI 테스트 결과](images/ssti-test-parse-error.png)
 
 `*` 연산자는 Handlebars 문법에서 지원되지 않기 때문에 파서 에러가 반환됐다. 그러나 에러 메시지 자체가 서버가 입력값을 Handlebars 템플릿으로 파싱 시도했다는 증거다. 스택 트레이스에 `/root/Backend/node_modules/handlebars/`가 노출되어 사용 중인 템플릿 엔진이 **Handlebars**임을 확인할 수 있다.
 
@@ -79,7 +79,7 @@ curl -s -X POST http://$IP \
   --data 'action=Submit'
 ```
 
-![require is not defined 에러](images/05-ssti-require-not-defined.png)
+![require is not defined 에러](images/ssti-require-not-defined.png)
 
 `ReferenceError: require is not defined` 에러가 반환됐다. Handlebars는 샌드박스 환경에서 실행되기 때문에, Node.js의 전역 함수인 `require`에 직접 접근이 차단된다. `require`는 `global` 객체의 프로퍼티가 아니라 모듈 시스템이 각 파일에 주입하는 함수이기 때문에, 샌드박스 컨텍스트에서는 존재하지 않는 것으로 처리된다.
 
@@ -97,9 +97,9 @@ curl -s -X POST http://$IP \
   --data 'action=Submit'
 ```
 
-![RCE id 명령어 페이로드](images/06-rce-id-command-payload.png)
+![RCE id 명령어 페이로드](images/rce-id-command-payload.png)
 
-![RCE id 명령어 결과](images/07-rce-id-command-result.png)
+![RCE id 명령어 결과](images/rce-id-command-result.png)
 
 응답에서 `uid=0(root) gid=0(root) groups=0(root)`가 확인됐다. 웹서버가 root 권한으로 실행되고 있으며, RCE가 성공적으로 달성됐다.
 
@@ -115,7 +115,7 @@ curl -s -X POST http://$IP \
   --data 'action=Submit'
 ```
 
-![Flag 획득 페이로드](images/08-flag-read-payload.png)
+![Flag 획득 페이로드](images/flag-read-payload.png)
 
 Flag를 성공적으로 획득했다.
 
