@@ -130,7 +130,7 @@ while(!s.isClosed()) {
 cat /root/flag.txt
 ```
 
-![Flag 획득](images/flag-result.png)
+![Flag 획득](images/flag.png)
 
 Flag를 성공적으로 획득했다.
 
