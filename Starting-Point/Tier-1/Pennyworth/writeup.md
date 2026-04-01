@@ -48,11 +48,13 @@ curl -v http://$IP:8080/login 2>&1 | head -30
 
 ### 3. Jenkins 로그인
 
-Jenkins 로그인 페이지에서 기본 자격증명으로 로그인을 시도한다.
+Jenkins 로그인 페이지에 접근했다.
 
 ![Jenkins 로그인 페이지](images/jenkins-login-page.png)
 
-기본 자격증명 `root:password`로 로그인에 성공했다.
+Jenkins는 CI/CD 자동화 도구로, 개발팀 내부에서 운영되는 경우가 많아 외부에 노출되는 서비스보다 보안 설정이 느슨한 경우가 많다. 초기 설치 이후 자격증명을 변경하지 않거나, 관리 편의를 위해 단순한 자격증명을 사용하는 사례가 흔하다. 이 점을 고려해 관리자 계정에서 자주 쓰이는 자격증명 조합인 `root:password`를 먼저 시도했다.
+
+로그인에 성공했다.
 
 ![Jenkins 대시보드](images/jenkins-dashboard.png)
 
