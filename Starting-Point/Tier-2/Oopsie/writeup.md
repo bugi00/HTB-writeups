@@ -117,7 +117,7 @@ id=1 조회 결과 admin의 Access ID가 **34322**임을 확인했다. 서버는
 
 페이지를 새로고침하면 서버는 조작된 쿠키를 그대로 신뢰하고 admin 권한으로 처리한다.
 
-![Uploads 페이지 활성화](images/uploads-page-guest.png)
+![Uploads 페이지 활성화](images/uploads-page-admin.png)
 
 쿠키 조작 후 Uploads 메뉴에 접근하면 파일 업로드 폼이 활성화된다.
 
