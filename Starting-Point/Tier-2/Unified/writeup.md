@@ -19,7 +19,7 @@ UniFi Network Controller 6.4.54에서 발생하는 Log4Shell(CVE-2021-44228) 취
 
 ---
 
-## 열거
+## Enumeration
 
 ### Nmap 스캔
 
