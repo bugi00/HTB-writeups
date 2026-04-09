@@ -16,7 +16,7 @@ Windows 서버에서 SMB 익명 접근으로 MSSQL 자격증명이 담긴 설정
 
 ---
 
-## 풀이 과정
+## Enumeration
 
 ### 1. 포트 스캔
 
