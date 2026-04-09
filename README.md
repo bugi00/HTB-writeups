@@ -41,7 +41,7 @@ HTB-writeups/
 │    │    ├── Tactics/
 │    │    └── Three/
 │    │
-│    └── Tier-2/        # Completed
+│    └── Tier-2/        # In progress
 │         ├── Archetype/
 │         ├── Oopsie/
 │         ├── Unified/
