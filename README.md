@@ -41,8 +41,10 @@ HTB-writeups/
 │    │    ├── Tactics/
 │    │    └── Three/
 │    │
-│    └── Tier-2/        # In progress
+│    └── Tier-2/        # Completed
 │         ├── Archetype/
+│         ├── Base/
+│         ├── Markup/
 │         ├── Oopsie/
 │         ├── Unified/
 │         └── Vaccine/
@@ -90,12 +92,14 @@ HTB-writeups/
 ---
 
 ### Starting Point - Tier 2
-| Machine   | Service                | Key Issue                             | Writeup                                        |
-|----------|------------------------|---------------------------------------|------------------------------------------------|
-| Archetype | SMB + MSSQL            | xp_cmdshell, PATH hijacking           | ./Starting-Point/Tier-2/Archetype/writeup.md   |
-| Oopsie    | HTTP                   | IDOR, broken access control, webshell | ./Starting-Point/Tier-2/Oopsie/writeup.md      |
-| Unified   | UniFi + Log4Shell      | CVE-2021-44228, MongoDB auth          | ./Starting-Point/Tier-2/Unified/writeup.md     |
-| Vaccine   | FTP + HTTP + PostgreSQL| SQL injection, webshell, SUID         | ./Starting-Point/Tier-2/Vaccine/writeup.md     |
+| Machine   | Service                | Key Issue                                        | Writeup                                        |
+|----------|------------------------|--------------------------------------------------|------------------------------------------------|
+| Archetype | SMB + MSSQL            | xp_cmdshell, PATH hijacking                      | ./Starting-Point/Tier-2/Archetype/writeup.md   |
+| Base      | HTTP                   | Vim swap file exposure, strcmp() type confusion, file upload RCE, sudo misconfiguration | ./Starting-Point/Tier-2/Base/writeup.md        |
+| Markup    | HTTP + SSH             | XXE injection, SSH key exposure, file permission misconfiguration | ./Starting-Point/Tier-2/Markup/writeup.md      |
+| Oopsie    | HTTP                   | IDOR, broken access control, webshell            | ./Starting-Point/Tier-2/Oopsie/writeup.md      |
+| Unified   | UniFi + Log4Shell      | CVE-2021-44228, MongoDB auth                     | ./Starting-Point/Tier-2/Unified/writeup.md     |
+| Vaccine   | FTP + HTTP + PostgreSQL| SQL injection, webshell, SUID                    | ./Starting-Point/Tier-2/Vaccine/writeup.md     |
 
 ---
 
@@ -115,8 +119,14 @@ HTB-writeups/
 - Local port forwarding (SSH tunneling)
 - PATH hijacking
 - SUID privilege escalation
+- sudo misconfiguration exploitation
 - MongoDB credential manipulation
 - Jenkins Groovy script console RCE
+- XXE injection
+- PHP type confusion (strcmp bypass)
+- Vim swap file analysis
+- Directory listing exploitation
+- Credential extraction from source code
 - Basic post-exploitation
 
 ---
