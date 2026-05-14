@@ -309,7 +309,6 @@ ssh enzo@planning.htb -L 8000:127.0.0.1:8000
 
 이 명령은 SSH 접속을 유지하면서 Kali의 로컬 포트 8000을 타겟 머신 내부의 `127.0.0.1:8000`으로 포워딩한다. 이후 Kali 브라우저에서 `http://127.0.0.1:8000`에 접근하면 타겟 내부 서비스에 연결된다.
 
-![ssh port forwarding](images/ssh_port_forwarding.png)
 ![crontab db contents](images/crontab_db_contents.png)
 브라우저에서 `http://127.0.0.1:8000`에 접속하고 `root / P4ssw0rdS0pRi0T3c`로 로그인한다.
 
