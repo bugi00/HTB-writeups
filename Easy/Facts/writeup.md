@@ -239,7 +239,7 @@ eval $(ssh-agent -s)
 ssh-add id_ed25519
 ```
 
-![ssh add key](images/ssh-add-key.png)
+![ssh add key](images/ssh-login-trivia.png)
 
 ```
 Identity added: /home/bugi/id_ed25519 (trivia@facts.htb)
@@ -256,7 +256,7 @@ ssh -i id_ed25519 trivia@facts.htb
 
 패스프레이즈 `dragonballz` 입력 후 접속에 성공한다.
 
-![ssh login trivia](images/ssh-login-trivia.png)
+![ssh login trivia](images/ssh-add-key.png)
 
 ```bash
 cat /home/william/user.txt
