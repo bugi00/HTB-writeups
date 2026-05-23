@@ -184,7 +184,7 @@ aws s3 ls s3://internal/ \
   --recursive | grep -v ".bundle"
 ```
 
-![aws s3 ls internal](images/aws-s3-ls-internal.png)
+![aws s3 ls internal](images/aws-s3-cp-sshkey.png)
 
 ```
 2026-01-09 03:45:13        220 .bash_logout
