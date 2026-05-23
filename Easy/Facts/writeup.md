@@ -79,7 +79,7 @@ feroxbuster -u http://facts.htb/ \
   -t 50 --no-recursion
 ```
 
-![feroxbuster scan](images/feroxbuster-scan.png)
+![feroxbuster scan](images/feroxbuster-config.png)
 
 주목할 엔드포인트:
 
