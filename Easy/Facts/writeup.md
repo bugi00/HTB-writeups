@@ -215,7 +215,6 @@ aws s3 cp s3://internal/.ssh/id_ed25519 ./id_ed25519 \
 
 개인키를 확인하면 `aes256-ctr` + `bcrypt`로 암호화되어 있어 패스프레이즈가 필요하다.
 
-![id ed25519 content](images/id-ed25519-content.png)
 
 ### 패스프레이즈 크래킹
 
