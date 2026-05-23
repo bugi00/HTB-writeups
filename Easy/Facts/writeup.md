@@ -165,7 +165,7 @@ aws s3 ls \
   --no-verify-ssl
 ```
 
-![aws s3 ls buckets](images/aws-s3-ls-buckets.png)
+![aws s3 ls buckets](images/aws-s3-ls-internal.png)
 
 ```
 2025-09-11 21:06:52 internal
