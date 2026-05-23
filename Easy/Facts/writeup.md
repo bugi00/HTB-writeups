@@ -211,7 +211,7 @@ aws s3 cp s3://internal/.ssh/id_ed25519 ./id_ed25519 \
   --no-verify-ssl
 ```
 
-![aws s3 cp sshkey](images/aws-s3-cp-sshkey.png)
+![aws s3 cp sshkey](images/authorized-keys-content.png)
 
 개인키를 확인하면 `aes256-ctr` + `bcrypt`로 암호화되어 있어 패스프레이즈가 필요하다.
 
