@@ -166,7 +166,7 @@ ssh mark@cctv.htb
 SSH 접속 후 `/opt` 디렉토리를 확인하면 `video` 폴더가 존재한다.
 
 ```bash
-ls -la /opt/video/uploads 2>/dev/null || ls -laR /opt/video
+ls -la /opt
 ```
 
 ![opt directory](images/opt_directory.png)
@@ -174,7 +174,7 @@ ls -la /opt/video/uploads 2>/dev/null || ls -laR /opt/video
 `/opt/video` 안의 구조를 확인하면 `backups/server.log` 파일이 발견된다.
 
 ```bash
-ls -laR /opt/video
+ls -la /opt/video/uploads 2>/dev/null || ls -laR /opt/video
 ```
 
 ![opt video directory](images/opt_video_directory.png)
