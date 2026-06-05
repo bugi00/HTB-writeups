@@ -271,7 +271,7 @@ EOF
 curl -s "http://127.0.0.1:8765/config/list?_username=admin&_signature=<sig>" | python3 -m json.tool
 ```
 
-![motioneye config list success](images/motioneye_config_list_success.png)
+![motioneye config list success](images/motioneye_config_list_suc.png)
 
 ### 페이로드 삽입 및 리버스 쉘 획득
 
