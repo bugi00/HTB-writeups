@@ -123,7 +123,6 @@ head -n 100000 rockyou.txt > small.txt
 hashcat -m 3200 hashes.txt small.txt
 ```
 
-VM 환경에서 bcrypt는 GPU 가속이 불가능하므로 macOS에서 OpenCL GPU 가속을 활용하여 크래킹한다.
 
 ![hashcat bcrypt setup](images/hashcat_bcrypt_setup.png)
 
