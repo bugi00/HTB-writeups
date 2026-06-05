@@ -219,9 +219,6 @@ motionEye의 파일명 설정에 쉘 메타문자가 삽입되면 motion이 설�
 
 motionEye 0.43.1b4 이하 버전에서 웹 UI의 `image_file_name` 설정 필드 검증이 클라이언트(JavaScript)에서만 이루어진다. 브라우저 콘솔에서 검증 함수를 덮어쓰면 `$()` 형식의 쉘 메타문자를 서버에 저장할 수 있다.
 
-```bash
-searchsploit motioneye
-```
 
 ![searchsploit motioneye](images/motioneye_signature_calculated.png)
 
