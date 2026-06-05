@@ -47,9 +47,9 @@ Wappalyzer로 분석하면 Apache HTTP Server 2.4.58, Ubuntu가 확인된다.
 
 ### ZoneMinder 로그인 및 버전 확인
 
-기본 크리덴셜 `admin/admin`으로 로그인에 성공한다.
+기본 크리덴셜 `admin/admin`으로 로그인에 성공하면 ZoneMinder 콘솔이 표시된다.
 
-![zoneminder login](images/zoneminder_login.png)
+![zoneminder console](images/zoneminder_console.png)
 
 Options 메뉴에서 현재 ZoneMinder 버전을 확인한다.
 
@@ -85,18 +85,19 @@ pip3 install requests --break-system-packages
 
 ![cve-2024-51482 exploit setup](images/cve_2024_51482_exploit_setup.png)
 
-취약점 확인 후 Users 테이블을 덤프한다.
+`--test` 옵션으로 취약 여부를 먼저 확인한다. 응답 시간이 2초 이상 지연되면 취약한 것이다.
 
 ```bash
 python3 CVE-2024-51482.py -i cctv.htb -u admin -p admin --test
-python3 CVE-2024-51482.py -i cctv.htb -u admin -p admin --users --sleep 5
 ```
-
-`--test` 옵션으로 먼저 취약 여부를 확인한다. 응답 시간이 2초 이상 지연되면 취약한 것이다.
 
 ![cve-2024-51482 exploit vulnerable](images/cve_2024_51482_exploit_vulnerable.png)
 
-Time-based Blind SQLi 특성상 글자 하나씩 추출하기 때문에 시간이 소요된다. `--sleep 5` 옵션으로 HTB 네트워크 지연에 대응한다. 덤프가 완료되면 아래와 같이 크리덴셜이 추출된다.
+취약점이 확인되면 Users 테이블을 덤프한다. Time-based Blind SQLi 특성상 글자 하나씩 추출하기 때문에 시간이 소요된다. `--sleep 5` 옵션으로 HTB 네트워크 지연에 대응한다.
+
+```bash
+python3 CVE-2024-51482.py -i cctv.htb -u admin -p admin --users --sleep 5
+```
 
 ![cve-2024-51482 credentials dumped](images/cve_2024_51482_credentials_dumped.png)
 
@@ -112,6 +113,8 @@ Time-based Blind SQLi 특성상 글자 하나씩 추출하기 때문에 시간�
 
 해시를 파일로 저장하고 hashcat으로 크래킹한다. `$2y$`는 bcrypt 알고리즘이므로 `-m 3200`을 사용한다. VM 환경에서는 bcrypt GPU 가속이 불가능하므로 macOS에서 OpenCL GPU 가속을 활용한다.
 
+rockyou.txt 전체를 돌리면 bcrypt 특성상 수일이 소요되므로 상위 10만 개만 잘라서 시도한다. 자주 사용되는 패스워드일수록 앞쪽에 위치하기 때문에 효과적이다.
+
 ```bash
 cat > hashes.txt << 'EOF'
 $2y$10$cmytVWFRnt1XfqsItsJRVe/ApxWxcIFQcURnm5N.rhlULwM0jrtbm
@@ -123,9 +126,9 @@ head -n 100000 rockyou.txt > small.txt
 hashcat -m 3200 hashes.txt small.txt
 ```
 
-rockyou.txt 전체를 돌리면 bcrypt 특성상 수일이 소요되므로 상위 10만 개만 잘라서 시도한다. 자주 사용되는 패스워드일수록 앞쪽에 위치하기 때문에 효과적이다.
+![hashcat bcrypt running](images/hashcat_bcrypt_running.png)
 
-![hashcat bcrypt setup](images/hashcat_bcrypt_setup.png)
+Apple M4 GPU(OpenCL)로 크래킹이 진행되며 약 15분 후 결과가 나온다.
 
 ![hashcat bcrypt cracked](images/hashcat_bcrypt_cracked.png)
 
@@ -158,14 +161,15 @@ ls -la /opt
 
 ![opt directory](images/opt_directory.png)
 
-`/opt/video/backups/server.log`를 확인하면 `sa_mark` 계정이 `status`, `disk-info` 명령을 주기적으로 실행하는 기록이 남아있다. 내부 어딘가에서 동작 중인 서비스가 있다는 것을 알 수 있다.
+`/opt/video` 안의 구조를 확인하면 `backups/server.log` 파일이 발견된다.
 
 ```bash
 ls -laR /opt/video
-cat /opt/video/backups/server.log
 ```
 
-![server log found](images/server_log_found.png)
+![opt video directory](images/opt_video_directory.png)
+
+`server.log`를 열어보면 `sa_mark` 계정이 `status`, `disk-info` 명령을 주기적으로 실행하는 기록이 남아있다. 내부 어딘가에서 동작 중인 서비스가 있다는 것을 알 수 있다.
 
 내부 리스닝 포트를 확인한다.
 
@@ -228,7 +232,11 @@ ssh -L 8765:127.0.0.1:8765 mark@cctv.htb
 
 ![ssh port forward](images/ssh_port_forward.png)
 
-`/etc/motioneye/motion.conf`에서 motionEye 관리자 크리덴셜을 확인한다.
+`/etc/motioneye/` 디렉토리에는 motionEye 설정 파일들이 있다.
+
+![motioneye conf files](images/motioneye_conf_password_found.png)
+
+`motion.conf`에서 motionEye 관리자 크리덴셜을 확인한다.
 
 ```bash
 grep -r "password\|username\|admin" /etc/motioneye/ 2>/dev/null
