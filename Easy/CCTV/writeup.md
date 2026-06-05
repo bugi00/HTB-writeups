@@ -263,7 +263,7 @@ print(f'URL: {path}&_signature={sig}')
 EOF
 ```
 
-![motioneye signature calculated](images/motioneye_signature_calculated.png)
+![motioneye signature calculated](images/motioneye_sig_cal.png)
 
 계산된 서명으로 API를 호출하면 카메라 설정 전체가 반환되며 인증 성공을 확인한다.
 
