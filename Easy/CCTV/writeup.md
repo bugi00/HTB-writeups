@@ -223,7 +223,7 @@ motionEye 0.43.1b4 이하 버전에서 웹 UI의 `image_file_name` 설정 필드
 searchsploit motioneye
 ```
 
-![searchsploit motioneye](images/searchsploit_motioneye.png)
+![searchsploit motioneye](images/motioneye_signature_calculated.png)
 
 버전이 정확히 일치하는 익스플로잇이 확인된다.
 
