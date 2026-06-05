@@ -138,7 +138,7 @@ hashcat -m 3200 hashes.txt small.txt
 
 ![hashcat bcrypt running](images/hashcat_bcrypt_running.png)
 
-약 15분 후 크래킹 결과가 나온다.
+
 
 ![hashcat bcrypt cracked](images/hashcat_bcrypt_cracked.png)
 
