@@ -159,7 +159,7 @@ ssh mark@cctv.htb
 
 ---
 
-## Lateral Movement
+## Privilege Escalation
 
 ### 내부 서비스 열거
 
@@ -213,7 +213,6 @@ motionEye의 파일명 설정에 쉘 메타문자가 삽입되면 motion이 설�
 
 ---
 
-## Privilege Escalation
 
 ### CVE-2025-60787 — motionEye RCE
 
