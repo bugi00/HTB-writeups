@@ -235,6 +235,7 @@ ssh -L 8765:127.0.0.1:8765 mark@cctv.htb
 
 ![motioneye conf directory](images/motioneye_conf_directory.png)
 
+![motioneye_password_grep](images/motioneye_password_grep.png)
 `motion.conf`에서 motionEye 관리자 크리덴셜을 확인한다. 저장된 해시값(`989c5a8...`)을 패스워드 입력란에 그대로 입력하면 로그인에 성공한다.
 
 ### motionEye API 서명 계산
