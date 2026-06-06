@@ -8,7 +8,7 @@
 | OS | Linux (Ubuntu 24.04) |
 | 난이도 | Easy |
 | 주요 취약점 | ZoneMinder Blind SQL Injection (CVE-2024-51482), motionEye Client-side Validation Bypass RCE (CVE-2025-60787) |
-| 주요 기술 | Blind Time-based SQLi, bcrypt 해시 크래킹, SSH 접속, 내부 서비스 포트 포워딩, motionEye API 서명 계산, Command Injection |
+| 주요 기술 | Blind Time-based SQLi, bcrypt 해시 크래킹, SSH 접속, 내부 서비스 포트 포워딩, Command Injection |
 
 CCTV는 ZoneMinder CCTV 관리 소프트웨어와 motionEye 카메라 관리 시스템을 운영하는 Linux 머신이다. ZoneMinder의 Blind SQL Injection 취약점으로 DB 크리덴셜을 덤프하고, bcrypt 해시를 크래킹하여 SSH 접속을 획득한다. 내부에서 동작 중인 motionEye의 Client-side Validation Bypass 취약점으로 카메라 설정 파일에 Command Injection 페이로드를 삽입하고, motion 프로세스가 설정을 재로드할 때 root 권한으로 리버스 쉘이 실행된다.
 
