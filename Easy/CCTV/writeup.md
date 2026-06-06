@@ -75,7 +75,7 @@ $sql = "SELECT * FROM Events_Tags WHERE TagId = $tagId"; // 취약 코드
 
 ![cve-2024-51482 overview](images/cve_2024_51482_overview.png)
 
-PoC를 clone하고 의존성을 설치한다.
+PoC를 clone하고 설치한다.
 
 ```bash
 git clone https://github.com/BridgerAlderson/CVE-2024-51482.git
