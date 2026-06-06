@@ -310,7 +310,6 @@ motionEye의 Client-side Validation Bypass는 웹 보안의 기본 원칙인 서
 | SSH 접속 | mark / opensesame | ssh |
 | 내부 서비스 열거 | /opt 탐색, 포트 확인, motionEye 발견 | ls, ss, curl |
 | motionEye 접근 | SSH 포트 포워딩 | ssh -L |
-| API 인증 | 소스코드 분석으로 서명 직접 계산 | Python |
 | JS 검증 우회 | 브라우저 콘솔에서 검증 함수 덮어쓰기 | 브라우저 DevTools |
 | Command Injection | `image_file_name`에 리버스 쉘 페이로드 삽입 | 브라우저 |
 | 리버스 쉘 (root) | motion 설정 재로드 시 페이로드 실행 | nc |
