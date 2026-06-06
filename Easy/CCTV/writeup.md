@@ -211,8 +211,6 @@ ls -la /var/lib/motioneye/Camera1/
 
 motionEye의 파일명 설정에 쉘 메타문자가 삽입되면 motion이 설정을 재로드할 때 명령어가 실행된다. 이것이 이 머신의 공격 경로임을 알 수 있다.
 
----
-
 
 ### CVE-2025-60787 — motionEye RCE
 
