@@ -6,7 +6,7 @@
 |------|------|
 | 머신 이름 | Forest |
 | OS | Windows Server 2016 (Domain Controller) |
-| 난이도 | Medium |
+| 난이도 | Easy |
 | 도메인 | htb.local |
 | 주요 취약점 | AS-REP Roasting (Kerberos Pre-Authentication 미설정), Account Operators 권한 남용을 통한 DCSync |
 | 주요 기술 | Null Session 열거, AS-REP Roasting, Kerberos 해시 크래킹, BloodHound 권한 경로 분석, WriteDACL 기반 DCSync, Pass-the-Hash |
