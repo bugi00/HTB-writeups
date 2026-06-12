@@ -169,7 +169,7 @@ john ~/hash.txt --wordlist=/usr/share/wordlists/rockyou.txt
 evil-winrm -i 10.129.12.27 -u svc-alfresco -p s3rvice
 ```
 
-![evilwinrm initial access](images/evilwinrm_initial_access.png)
+![whoami_all_groups](images/whoami_all_groups.png)
 
 ### User Flag
 
@@ -177,7 +177,7 @@ evil-winrm -i 10.129.12.27 -u svc-alfresco -p s3rvice
 type C:\Users\svc-alfresco\Desktop\user.txt
 ```
 
-![user flag](images/user_flag.png)
+![whoami_all_privileges](images/whoami_all_privileges.png)
 
 ---
 
