@@ -142,7 +142,7 @@ EOF
 impacket-GetNPUsers htb.local/ -usersfile ~/users.txt -no-pass -dc-ip 10.129.12.27
 ```
 
-![getnpusers asrep hash](images/getnpusers_asrep_hash.png)
+![john_crack_s3rvice](images/john_crack_s3rvice.png)
 
 다른 계정은 모두 `UF_DONT_REQUIRE_PREAUTH set` 이 아니라는 메시지가 뜨고, `svc-alfresco`만 `$krb5asrep$23$...` 형식의 해시를 반환한다. 이는 enumeration 단계에서 확인한 acb 플래그 결과와 정확히 일치한다.
 
