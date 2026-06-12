@@ -191,11 +191,11 @@ type C:\Users\svc-alfresco\Desktop\user.txt
 whoami /all
 ```
 
-![whoami all groups](images/whoami_all_groups.png)
+![whoami_all](images/whoami_all.png)
 
 `BUILTIN\Account Operators` 멤버십이 핵심이다. Account Operators는 도메인 내 대부분의 그룹(고권한 그룹 제외)에 멤버를 추가/삭제할 수 있는 그룹이다. 이 권한이 이후 공격 체인의 진입점이 된다.
 
-![whoami all privileges](images/whoami_all_privileges.png)
+![privileges_info](images/privileges_info.png)
 
 Privileges 섹션에는 SeImpersonate, SeDebug 같은 직접적인 LPE 권한이 없다. 즉 토큰 기반 권한 상승은 불가능하고, 그룹 멤버십 기반 경로로 가야 함이 확정된다.
 
