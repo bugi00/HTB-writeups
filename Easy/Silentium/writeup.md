@@ -13,7 +13,7 @@
 | 머신 이름 | Silentium |
 | OS | Ubuntu 24.04.4 LTS |
 | IP | 10.129.245.103 |
-| 난이도 | Hard |
+| 난이도 | Easy |
 | 주요 취약점 | CVE-2025-58434 (Flowise 비밀번호 재설정 토큰 노출), CVE-2025-59528 (Flowise CustomMCP RCE), CVE-2025-64111 (Gogs Symlink to RCE) |
 | 주요 기술 | vhost 열거, 이메일 열거, API 취약점 체이닝, Node.js 소켓 리버스 쉘, 컨테이너 탈출(환경변수), Git hook 주입 |
 
