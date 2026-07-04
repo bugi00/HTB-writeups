@@ -52,6 +52,8 @@ gobuster dir -u http://silentium.htb \
   -x php,html,txt,json -t 50 --exclude-length 8753
 ```
 
+![gobuster result](images/gobuster_wildcard_excluded_assets_found.png)
+
 `/assets`만 발견되어 메인 도메인은 공격면이 없음을 확인한다.
 
 ### Subdomain Enumeration
@@ -151,6 +153,8 @@ curl -s -c cookies.txt -X POST http://staging.silentium.htb/api/v1/auth/login \
 ```
 
 응답에 `"name":"admin"`, `"isOrganizationAdmin":true`가 포함되어 admin 로그인에 성공했다.
+
+![flowise admin dashboard](images/flowise_admin_dashboard_logged_in.png)
 
 ### x-request-from: internal 헤더 발견
 
@@ -255,6 +259,11 @@ sudo -l은 권한 없음을 반환한다. 내부 포트와 root 프로세스를 
 
 ```bash
 ss -tlnp
+```
+
+![internal ports](images/host_ss_internal_ports_37747_3001_3000.png)
+
+```bash
 ps aux | grep root | grep -v '\['
 ```
 
