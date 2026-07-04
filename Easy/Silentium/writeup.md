@@ -160,7 +160,6 @@ curl -s -c cookies.txt -X POST http://staging.silentium.htb/api/v1/auth/login \
 
 admin 세션 쿠키로 API를 호출하면 여전히 401이 반환된다. 브라우저 개발자도구 Network 탭에서 실제 웹 UI가 보내는 요청을 분석하면, Flowise 프론트엔드가 모든 API 요청에 **`x-request-from: internal`** 헤더를 추가하고 있음을 발견한다. 서버 미들웨어가 이 헤더의 존재 여부로 내부 웹 UI 요청과 외부 요청을 구분한다.
 
-![x-request-from internal header](images/flowise_browser_network_x-request-from_internal_header.png)
 
 이후 모든 API 요청에 이 헤더를 추가하면 인증이 정상 통과된다.
 
