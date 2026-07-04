@@ -68,7 +68,7 @@ ffuf -u http://silentium.htb \
 ```
 
 ![ffuf vhost result](images/ffuf_vhost_result_staging_200.png)
-
+![ffuf_vhost_fuzzing_staging_discovered](images/ffuf_vhost_fuzzing_staging_discovered.png)
 `staging` 서브도메인이 Size 3142로 다른 응답을 반환한다. `/etc/hosts`에 추가 후 접속하면 Flowise 로그인 페이지가 표시된다.
 
 ```bash
