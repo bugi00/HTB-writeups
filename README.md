@@ -4,7 +4,7 @@ Hack The Box 머신 라이트업 모음. **재현보다 사고 과정**에 초�
 
 각 라이트업은 다음 구조를 따른다: 열거 → 분석 → 익스플로잇 → 플래그 획득 → 근본 원인.
 
-Starting Point와 Easy·Medium 라이트업을 공개한다. **공개하면 안 되는 머신(비공개 대상)의 상세 풀이는 개인 Notion에서 관리**하며 유출 방지를 위해 저장소에 포함하지 않는다. 아래 비공개 목록에는 이름, OS, 난이도만 표기하고 상세 내용은 요청 시 공유한다.
+Starting Point와 retired된 Easy·Medium 라이트업을 공개한다. **아직 retire되지 않았거나 공개하면 안 되는 머신의 상세 풀이는 개인 Notion에서 관리**하며 유출 방지를 위해 저장소에 포함하지 않는다. 아래 비공개 목록에는 이름, OS, 난이도만 표기하고 상세 내용은 요청 시 공유한다.
 
 ---
 
@@ -28,12 +28,10 @@ HTB-writeups/
 | 난이도          | 완료(solved) | 공개 라이트업(이 저장소) | 비공개(Notion) |
 |-----------------|--------------|--------------------------|----------------|
 | Starting Point  | 25           | 25                       | —              |
-| Easy            | 7            | 6                        | 1              |
-| Medium          | 7            | 3                        | 4              |
+| Easy            | 8            | 6                        | 2              |
+| Medium          | 6            | 2                        | 4              |
 | Hard            | 2            | —                        | 2              |
-| **합계**        | **41**       | **34**                   | **7**          |
-
-> 난이도는 HackTheBox 공식 기준. CCTV는 저장소상 `Easy/` 폴더에 있으나 공식 난이도는 Medium이라 아래 표에는 Medium으로 분류했다.
+| **합계**        | **41**       | **33**                   | **8**          |
 
 ---
 
@@ -41,13 +39,12 @@ HTB-writeups/
 
 | 머신        | 난이도 | OS      | 핵심 기법                                                        | 라이트업                          |
 |------------|--------|---------|------------------------------------------------------------------|----------------------------------|
+| CCTV        | Easy   | Linux   | ZoneMinder, SQLi (CVE-2024-51482), capability 악용, RCE (CVE-2025-60787) | [writeup](./Easy/CCTV/writeup.md) |
 | Facts       | Easy   | Linux   | 웹 열거, AWS S3 설정 오류                                         | [writeup](./Easy/Facts/writeup.md)       |
 | Forest      | Easy   | Windows | AD 열거, AS-REP roasting, DCSync                                  | [writeup](./Easy/Forest/writeup.md)      |
 | Nocturnal   | Easy   | Linux   | IDOR, ISPConfig RCE (CVE-2023-46818)                             | [writeup](./Easy/Nocturnal/writeup.md)   |
 | Planning    | Easy   | Linux   | Grafana RCE (CVE-2024-9264), cron 권한 상승                       | [writeup](./Easy/Planning/writeup.md)    |
-| Silentium   | Easy   | Linux   | Flowise RCE, 컨테이너 탈출, Gogs RCE                             | [writeup](./Easy/Silentium/writeup.md)   |
 | Support     | Easy   | Windows | LDAP 자격증명 추출, RBCD                                         | [writeup](./Easy/Support/writeup.md)     |
-| CCTV        | Medium | Linux   | ZoneMinder, SQLi (CVE-2024-51482), capability 악용, RCE (CVE-2025-60787) | [writeup](./Easy/CCTV/writeup.md) |
 | Environment | Medium | Linux   | Laravel 익스플로잇, sudo BASH_ENV 권한 상승                       | [writeup](./Medium/Environment/writeup.md) |
 | Voleur      | Medium | Windows | AD Kerberos 악용, DPAPI, Backup Operators                        | [writeup](./Medium/Voleur/writeup.md)    |
 
@@ -99,10 +96,11 @@ HTB-writeups/
 
 ## 풀이 완료 — 비공개 (Notion)
 
-공개 불가 머신의 상세 풀이는 비공개로 유지한다. 기법은 Notion에 정리되어 있으며 요청 시 공유 가능하다.
+아직 retire되지 않았거나 공개하면 안 되는 머신의 상세 풀이는 비공개로 유지한다. 기법은 Notion에 정리되어 있으며 요청 시 공유 가능하다.
 
 | 머신       | 난이도 | OS      | 주제                              |
 |-----------|--------|---------|-----------------------------------|
+| Silentium  | Easy   | Linux   | Flowise RCE, 컨테이너 탈출, Gogs RCE |
 | Reactor    | Easy   | Linux   | 웹 익스플로잇, Node.js inspector  |
 | DevHub     | Medium | Linux   | MCP 서버 익스플로잇, hidden admin API |
 | Helix      | Medium | Linux   | Apache NiFi RCE, OPC-UA           |
@@ -165,5 +163,5 @@ HTB-writeups/
 ## 비고
 
 - 모든 머신은 Hack The Box에서 제공된다.
-- 공개하면 안 되는 머신의 라이트업은 HTB 정책에 따라 Notion에서 비공개로 관리한다.
+- 공개 라이트업은 Starting Point 및 retired 머신에 한정한다. active 머신 풀이는 HTB 정책에 따라 Notion에서 비공개로 관리한다.
 - 교육 목적으로만 사용한다.
